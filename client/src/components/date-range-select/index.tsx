@@ -157,10 +157,10 @@ export const DateRangeSelect = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           className={cn(
-            `w-[200px] flex items-center justify-between text-left font-normal !bg-[var(--secondary-dark-color)]
-            border-gray-700 !text-white !cursor-pointer`,
+            `w-[200px] flex items-center justify-between text-left font-normal !bg-white dark:!bg-gray-800 dark:
+            border-gray-700 !text-black dark:!text-white !cursor-pointer`,
             !dateRange && "text-muted-foreground"
           )}
         >

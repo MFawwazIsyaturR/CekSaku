@@ -59,7 +59,7 @@ const DashboardDataChart: React.FC<PropsType> = (props) => {
   }
 
   return (
-    <Card className="!shadow-none border-1 border-gray-100 dark:border-border !pt-0">
+    <Card className=" border-1 border-gray-100 dark:border-border !pt-0">
       <CardHeader
         className="flex flex-col items-stretch !space-y-0 border-b border-gray-100
        dark:border-border !p-0 pr-1 sm:flex-row"
@@ -166,6 +166,14 @@ const DashboardDataChart: React.FC<PropsType> = (props) => {
                     }}
                   />
                 }
+              /><Area
+                dataKey="income"
+                type="natural"
+                fill="url(#incomeGradient)"
+                fillOpacity={0.4}
+                stroke={COLORS[0]}
+                strokeWidth={2}
+//                 stackId="1"
               />
               <Area
                 dataKey="expenses"
@@ -174,17 +182,9 @@ const DashboardDataChart: React.FC<PropsType> = (props) => {
                 fillOpacity={0.4}
                 stroke={COLORS[1]}
                 strokeWidth={2}
-                stackId="1"
+//                 stackId="1"
               />
-              <Area
-                dataKey="income"
-                type="natural"
-                fill="url(#incomeGradient)"
-                fillOpacity={0.4}
-                stroke={COLORS[0]}
-                strokeWidth={2}
-                stackId="1"
-              />
+              
               <ChartLegend
                 verticalAlign="bottom"
                 content={<ChartLegendContent />}
@@ -198,7 +198,7 @@ const DashboardDataChart: React.FC<PropsType> = (props) => {
 };
 
 const ChartSkeleton = () => (
-  <Card className="!shadow-none border-1 border-gray-100 dark:border-border !pt-0">
+  <Card className=" border-1 border-gray-100 dark:border-border !pt-0">
     <CardHeader className="flex flex-col items-stretch !space-y-0 border-b border-gray-100 dark:border-border !p-0 pr-1 sm:flex-row">
       <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-0 sm:py-0">
         <Skeleton className="h-6 w-48" />

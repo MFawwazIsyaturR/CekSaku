@@ -110,20 +110,32 @@ export const transactionColumns: ColumnDef<TransactionType>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="capitalize">
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${
-            row.getValue("type") === _TRANSACTION_TYPE.INCOME
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          {row.getValue("type")}
-        </span>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const transactionType = row.getValue("type") as string; // Dapatkan nilai tipe asli (INCOME/EXPENSE)
+      const isIncome = transactionType === _TRANSACTION_TYPE.INCOME; // Cek apakah INCOME
+
+      // Tentukan teks yang akan ditampilkan
+      const displayText = isIncome ? "PEMASUKAN" : "PENGELUARAN";
+
+      // Tentukan kelas CSS berdasarkan tipe
+      const displayClasses = isIncome
+        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" // Kelas untuk Pemasukan
+        : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"; // Kelas untuk Pengeluaran
+
+      return (
+        <div>
+          <span
+            // Terapkan kelas CSS yang sudah ditentukan
+            className={`px-2 py-1 rounded-full text-xs font-medium ${displayClasses}`}
+          >
+            {/* Tampilkan displayText yang sudah ditentukan */}
+            {displayText}
+          </span>
+        </div>
+      );
+    },
     filterFn: (row, id, value) => {
+      // Filter tetap berdasarkan nilai asli (INCOME/EXPENSE) jika diperlukan
       return value.includes(row.getValue(id));
     },
   },

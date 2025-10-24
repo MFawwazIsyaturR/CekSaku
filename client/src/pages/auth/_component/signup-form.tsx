@@ -22,8 +22,9 @@ import {
 } from "@/features/auth/authAPI";
 import { useAppDispatch } from "@/app/hook";
 import { setCredentials } from "@/features/auth/authSlice";
-import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 const schema = z
   .object({
@@ -60,37 +61,23 @@ const RegisterForm = () => {
     },
   });
 
-  const handleGoogleLogin = useGoogleLogin({
-    flow: "auth-code",
-    onSuccess: (codeResponse) => {
-      googleLoginMutation({ code: codeResponse.code })
-        .unwrap()
-        .then((data) => {
-          dispatch(setCredentials(data));
-          toast.success("Pendaftaran dengan Google berhasil");
-          setTimeout(() => navigate(PROTECTED_ROUTES.OVERVIEW), 1000);
-        })
-        .catch((error) => {
-          console.error("Login Google Gagal", error);
-          toast.error(error.data?.message || "Gagal login dengan Google");
-        });
-    },
-    onError: () => {
-      toast.error("Login Google gagal. Silakan coba lagi.");
-    },
-  });
+const handleGoogleLoginClick = () => {
+  const state = uuidv4(); // Generate state unik
+  localStorage.setItem('oauth_state', state); // Simpan state
 
-  const handleGitHubLoginClick = () => {
-    const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-    if (!githubClientId) {
-      toast.error("GitHub Client ID is not configured.");
-      return;
-    }
-    const redirectUri = "http://localhost:5173/auth/github/callback";
-    const scope = "read:user user:email";
-    window.location.assign(
-      `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=${scope}`
-    );
+  // Bangun URL otentikasi Google DENGAN state
+  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_GOOGLE_REDIRECT_URI}&response_type=code&scope=openid%20profile%20email&state=${state}`; // Tambahkan &state=${state}
+
+  window.location.assign(googleAuthUrl); // Redirect pengguna
+};
+
+const handleGitHubLoginClick = () => {
+    const state = uuidv4();
+    localStorage.setItem('oauth_state', state);
+
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${import.meta.env.VITE_GITHUB_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_GITHUB_REDIRECT_URI}&scope=read:user%20user:email&state=${state}`; // Tambahkan &state=${state}
+
+    window.location.assign(githubAuthUrl);
   };
 
   const onSubmit = (values: FormValues) => {
@@ -111,9 +98,9 @@ const RegisterForm = () => {
       <div className="w-full max-w-md bg-gradient-to-b from-gray-900 via-black to-black backdrop-blur-md border border-gray-800 rounded-2xl shadow-lg p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Buat Akun</h1>
+          <h1 className="text-3xl font-bold text-white">Daftar Akun</h1>
           <p className="text-sm text-gray-400 mt-2">
-            Daftar akun baru dan mulai petualanganmu 🚀
+            Buat akun baru dan mulai petualanganmu 🚀
           </p>
         </div>
 
@@ -280,7 +267,7 @@ const RegisterForm = () => {
                 type="button"
                 variant="outline"
                 className="group w-full flex items-center justify-center gap-2 bg-[#1A1A1A] border-gray-700 hover:bg-white hover:cursor-pointer text-white rounded-xl transition"
-                onClick={() => handleGoogleLogin()}
+                onClick={() => handleGoogleLoginClick()}
                 disabled={isGoogleLoading}
               >
                 {isGoogleLoading ? (

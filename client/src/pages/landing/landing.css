@@ -186,9 +186,6 @@
     margin: 0 auto;
 }
 
-.faq-section-container:hover {
-  ackground: rgba(255, 255, 255, 0.5);
-}
 
 .quote-section {
   padding: 6rem 2rem;

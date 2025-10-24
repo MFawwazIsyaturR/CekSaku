@@ -12,12 +12,14 @@ import Billing from "@/pages/settings/billing";
 import GithubCallback from "@/pages/auth/GithubCallback";
 import ForgotPasswordPage from "@/pages/auth/forgot-password";
 import Security from "@/pages/settings/security";
+import GoogleCallback from "@/pages/auth/GoogleCallback";
 
 export const authenticationRoutePaths = [
   { path: AUTH_ROUTES.LANDING, element: <LandingPage /> },
   { path: AUTH_ROUTES.SIGN_IN, element: <SignIn /> },
   { path: AUTH_ROUTES.SIGN_UP, element: <SignUp /> },
-  { path: "/auth/github/callback", element: <GithubCallback /> },
+  { path: "/auth/google/callback", element: <GoogleCallback /> },
+{ path: "/auth/github/callback", element: <GithubCallback /> },
   { path: AUTH_ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
 ];
 

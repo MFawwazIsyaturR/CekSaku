@@ -4,10 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Card,CardAction,CardContent,CardDescription,CardHeader,CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { PROTECTED_ROUTES } from "@/routes/common/routePath"
+import { cn } from "@/lib/utils"
 
 const DashboardRecentTransactions = () => {
   return (
-    <Card className="!shadow-none border-1 border-gray-100 dark:border-border">
+   <Card className={cn(
+       "bg-white/60 dark:bg-gray-800/60 backdrop-blur-md shadow-lg rounded-lg border border-white/20 dark:border-gray-700/40 transition-all hover:bg-white/70 dark:hover:bg-gray-800/70" // Border solid standar
+    
+     )}>
     <CardHeader className="!pb-0">
       <CardTitle className="text-xl">Transaksi Terbaru</CardTitle>
       <CardDescription>Menampilkan semua transaksi terbaru</CardDescription>

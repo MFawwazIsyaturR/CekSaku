@@ -146,6 +146,32 @@ html, body, #root {
   margin: 0;
   padding: 0;
   overflow-x: hidden; 
+  scrollbar-width: thin; /* 'thin' = tipis, 'auto' = default */
+  scrollbar-color: #888 #1e1e1e; /* (1) Warna gagang, (2) Warna track */
+}
+
+/* --- Scrollbar Minimalis Modern (Dark Mode) --- */
+
+/* Ini menargetkan semua scrollbar di body */
+body::-webkit-scrollbar {
+  width: 8px; /* Lebar scrollbar */
+}
+
+/* Bagian "track" atau rel scrollbar */
+body::-webkit-scrollbar-track {
+  background: #1e1e1e; /* Warna background track, sesuaikan dengan bg gelap web kamu */
+}
+
+/* Bagian "thumb" atau gagang scrollbar yang digerakkan */
+body::-webkit-scrollbar-thumb {
+  background-color: #555; /* Warna gagang scrollbar */
+  border-radius: 10px; /* Membuat gagang jadi bulat */
+  border: 2px solid #1e1e1e; /* Memberi sedikit padding agar tidak nempel track */
+}
+
+/* Efek saat gagang di-hover */
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #888; /* Warna gagang saat di-hover */
 }
 
 .landing-page-container,

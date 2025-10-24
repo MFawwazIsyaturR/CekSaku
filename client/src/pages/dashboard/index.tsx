@@ -1,41 +1,51 @@
-import DashboardDataChart from "./dashboard-data-chart";
-import DashboardSummary from "./dashboard-summary";
-import PageLayout from "@/components/page-layout";
-//import ExpenseBreakDown from "./expense-breakdown";
+// client/src/pages/dashboard/index.tsx
+import { useState } from "react";
+import DashboardPageHeader from "./_component/dashboard-page-header";
+import DashboardStats from "./_component/dashboard-stats";
+// import QuickActions from "./_component/quick-actions";
 import ExpensePieChart from "./expense-pie-chart";
 import DashboardRecentTransactions from "./dashboard-recent-transactions";
-import { useState } from "react";
 import { DateRangeType } from "@/components/date-range-select";
+import DashboardDataChart from "./dashboard-data-chart"; // <-- Impor kembali Data Chart
 
 const Dashboard = () => {
-  const [dateRange, _setDateRange] = useState<DateRangeType>(null);
+  const [dateRange, setDateRange] = useState<DateRangeType>(null);
 
   return (
-    <div className="w-full flex flex-col">
-      {/* Dashboard Summary Overview */}
-      <PageLayout
-        className="space-y-6"
-        renderPageHeader={
-          <DashboardSummary
-            dateRange={dateRange}
-            setDateRange={_setDateRange}
-          />
-        }
-      >
-        {/* Dashboard Main Section */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-8">
-          <div className="lg:col-span-4">
-            <DashboardDataChart dateRange={dateRange} />
-          </div>
-          <div className="lg:col-span-2">
-            <ExpensePieChart dateRange={dateRange} />
-          </div>
+    // Padding utama untuk halaman
+    <div className="p-6 md:p-8 space-y-6">
+
+      {/* 1. Header Halaman */}
+      <DashboardPageHeader dateRange={dateRange} setDateRange={setDateRange} />
+
+      {/* 2. Kartu Ringkasan (Summary Cards) */}
+      <DashboardStats dateRange={dateRange} />
+
+      {/* 3. Grid untuk Quick Actions dan Chart */}
+      {/* Gunakan grid 3 kolom di layar besar (lg) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* Quick Actions (1 kolom)
+        <div className="lg:col-span-1">
+          <QuickActions />
+        </div> */}
+
+        {/* Dashboard Data Chart (Grafik Garis - 1 kolom) */}
+        <div className="lg:col-span-2">
+          <DashboardDataChart dateRange={dateRange} />
         </div>
-        {/* Dashboard Recent Transactions */}
-        <div className="w-full mt-0">
-          <DashboardRecentTransactions />
+
+        {/* Expense Pie Chart (Grafik Pai - 1 kolom) */}
+        <div className="lg:col-span-1">
+          <ExpensePieChart dateRange={dateRange} />
         </div>
-      </PageLayout>
+      </div>
+
+      {/* 4. Riwayat Transaksi (Di luar grid, lebar penuh) */}
+      <div className="w-full">
+        <DashboardRecentTransactions />
+      </div>
+
     </div>
   );
 };

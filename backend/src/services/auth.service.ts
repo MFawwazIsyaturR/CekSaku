@@ -26,7 +26,7 @@ import bcrypt from 'bcrypt';
 const googleClient = new OAuth2Client({
   clientId: Env.GOOGLE_CLIENT_ID,
   clientSecret: Env.GOOGLE_CLIENT_SECRET,
-  redirectUri: 'postmessage',
+  redirectUri: Env.GOOGLE_REDIRECT_URI,
 });
 
 export const registerService = async (body: RegisterSchemaType) => {

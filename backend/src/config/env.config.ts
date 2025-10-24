@@ -18,6 +18,7 @@ const envConfig = () => ({
 
   GOOGLE_CLIENT_ID: getEnv("GOOGLE_CLIENT_ID"),
   GOOGLE_CLIENT_SECRET: getEnv("GOOGLE_CLIENT_SECRET"),
+  GOOGLE_REDIRECT_URI: getEnv("GOOGLE_REDIRECT_URI"),
 
   GEMINI_API_KEY: getEnv("GEMINI_API_KEY") as string,
 

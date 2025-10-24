@@ -8,18 +8,13 @@ import { Link } from "react-router-dom";
 import { AUTH_ROUTES } from "@/routes/common/routePath";
 import Logo from "@/components/logo/logo";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
-import {
-  ArrowDown,
-  BarChart,
-  FileText,
-  Import,
-  ScanLine,
-} from "lucide-react";
+import { ArrowDown, BarChart, FileText, Import, ScanLine } from "lucide-react";
 import "./landing.css";
 import React, { useState } from "react";
 import warrenBuffettImg from "@/assets/images/warren-buffett.png";
 import mockupImg from "@/assets/images/mockup-ceksaku.png";
 import { Plus, Minus } from "lucide-react";
+import PricingSection from "./PricingSection";
 
 const leftFeatures = [
   {
@@ -71,8 +66,6 @@ const features = [
       "Terima laporan keuangan bulanan yang informatif langsung ke email Anda.",
   },
 ];
-
-
 
 const faqData = [
   {
@@ -138,7 +131,7 @@ const LandingPage = () => {
                   Daftar
                 </Link>
                 <Link to={AUTH_ROUTES.SIGN_IN} className="flex items-center">
-                  <button className="final-cta-button !mt-0">
+                  <button className="final-cta-button cursor-pointer !mt-0">
                     Mulai Sekarang
                   </button>
                 </Link>
@@ -150,7 +143,7 @@ const LandingPage = () => {
               className="text-5xl md:text-7xl font-bold hero-title-gradient opacity-0"
               style={{ animation: `reveal-up 1s ease 0.2s forwards` }}
             >
-              Kelola Uang, Ingat CekSaku
+              Ingat Uang <br /> Ingat CekSaku
             </h1>
             <p
               className="mt-6 text-lg max-w-2xl text-gray-300 opacity-0"
@@ -164,7 +157,7 @@ const LandingPage = () => {
             <ScrollReveal>
               <div className="mt-8 flex flex-col items-center gap-4">
                 <Link to={AUTH_ROUTES.SIGN_UP}>
-                  <button className="final-cta-button h-12 w-48 text-base">
+                  <button className="final-cta-button h-12 w-48 text-base cursor-pointer">
                     Mulai Sekarang
                   </button>
                 </Link>
@@ -289,9 +282,9 @@ const LandingPage = () => {
             </div>
           </div>
         </section>
-        <section className="quote-section my-48 overflow-x-hidden px-4">
+        <section className="quote-section my-24 overflow-x-hidden px-4">
           <ScrollReveal>
-            <div className="mt-16 rounded-xl bg-gradient-to-l from-gray-400 via-gray-600 to-gray-black p-1">
+            <div className="mt-10 rounded-xl bg-gradient-to-l from-gray-400 via-gray-600 to-gray-black p-1">
               <div
                 className="rounded-lg p-8"
                 style={{ backgroundColor: "#0c0c0f" }}
@@ -328,6 +321,9 @@ const LandingPage = () => {
             </div>
           </ScrollReveal>
         </section>
+
+        <PricingSection />
+
         <section className="final-section">
           <ScrollReveal>
             <div className="final-cta-container mt-48 mb-48">
@@ -338,8 +334,10 @@ const LandingPage = () => {
                 Tidak ada waktu yang lebih baik dari sekarang untuk memulai
                 perjalanan
               </p>
-              <Link to={AUTH_ROUTES.SIGN_UP}>
-                <button className="final-cta-button">Mulai sekarang</button>
+              <Link to={AUTH_ROUTES.SIGN_IN}>
+                <button className="final-cta-button cursor-pointer">
+                  Mulai sekarang
+                </button>
               </Link>
             </div>
           </ScrollReveal>

@@ -105,7 +105,9 @@ const ForgotPasswordPage = () => {
         {!emailSent ? (
           <div className="space-y-4">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-300">Lupa Kata Sandi?</h1>
+              <h1 className="text-2xl font-bold text-gray-300">
+                Lupa Kata Sandi?
+              </h1>
               <p className="text-muted-foreground text-sm">
                 Masukkan email Anda untuk menerima kode reset.
               </p>
@@ -122,19 +124,23 @@ const ForgotPasswordPage = () => {
                     <FormItem>
                       <FormLabel className="text-white">Email</FormLabel>
                       <FormControl>
-  <Input
-    className="text-white border-none
+                        <Input
+                          className="text-white border-none
                focus-visible:ring-0 
                focus-visible:ring-offset-0"
-    placeholder="me@contoh.com"
-    {...field}
-  />
-</FormControl>
+                          placeholder="me@contoh.com"
+                          {...field}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-gradient-to-r from-white to-gray-300 text-black font-bold" disabled={isSending}>
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-white to-gray-300 text-black font-bold"
+                  disabled={isSending}
+                >
                   {isSending && (
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
                   )}
@@ -146,10 +152,12 @@ const ForgotPasswordPage = () => {
         ) : (
           <div className="space-y-4">
             <div className="text-center">
-              <h1 className="text-2xl font-bold">Verifikasi Kode</h1>
+              <h1 className="text-2xl font-bold text-white">Verifikasi Kode</h1>
               <p className="text-muted-foreground text-sm">
                 Kami telah mengirimkan kode 6 digit ke{" "}
-                <span className="font-medium text-foreground">{userEmail}</span>
+                <span className="font-medium text-foreground text-white">
+                  {userEmail}
+                </span>
               </p>
             </div>
             <Form {...resetForm}>
@@ -162,53 +170,60 @@ const ForgotPasswordPage = () => {
                   <Input type="text" autoComplete="username" />
                   <Input type="password" autoComplete="new-password" />
                 </div>
-              <FormField
-                control={resetForm.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem className='flex flex-col items-center'> 
-                    <FormLabel>Kode Verifikasi</FormLabel>
-                    <FormControl>
-                      <InputOTP
-                        maxLength={6}
-                        {...field}
-                        pattern="[0-9]*" // <-- UBAH JADI INI
-                        inputMode="numeric"
-                        autoFocus
-                        autoComplete="one-time-code" 
-                      >
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                          <InputOTPSlot index={1} />
-                          <InputOTPSlot index={2} />
-                          <InputOTPSlot index={3} />
-                          <InputOTPSlot index={4} />
-                          <InputOTPSlot index={5} />
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={resetForm.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-center">
+                      <FormLabel className="text-white my-4">
+                        Kode Verifikasi
+                      </FormLabel>
+                      <FormControl>
+                        <InputOTP
+                          maxLength={6}
+                          {...field}
+                          pattern="[0-9]*"
+                          inputMode="numeric"
+                          autoFocus
+                          autoComplete="one-time-code"
+                        >
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} className="text-white" />
+                            <InputOTPSlot index={1} className="text-white" />
+                            <InputOTPSlot index={2} className="text-white" />
+                            <InputOTPSlot index={3} className="text-white" />
+                            <InputOTPSlot index={4} className="text-white" />
+                            <InputOTPSlot index={5} className="text-white" />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={resetForm.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kata Sandi Baru</FormLabel>
+                      <FormLabel className="text-white">
+                        Kata Sandi Baru
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
                             placeholder="********"
                             {...field}
+                            className="text-white border-none
+               focus-visible:ring-0 
+               focus-visible:ring-offset-0"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-white"
                             aria-label={
                               showPassword
                                 ? "Sembunyikan kata sandi"
@@ -232,13 +247,18 @@ const ForgotPasswordPage = () => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Konfirmasi Kata Sandi Baru</FormLabel>
+                      <FormLabel className="text-white">
+                        Konfirmasi Kata Sandi Baru
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showConfirmPassword ? "text" : "password"}
                             placeholder="********"
                             {...field}
+                            className="text-white border-none
+               focus-visible:ring-0 
+               focus-visible:ring-offset-0"
                           />
                           <button
                             type="button"
@@ -264,7 +284,11 @@ const ForgotPasswordPage = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-gradient-to-r from-white to-gray-300 text-black font-bold" disabled={isResetting}>
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-white to-gray-300 text-black font-bold"
+                  disabled={isResetting}
+                >
                   {isResetting && (
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
                   )}

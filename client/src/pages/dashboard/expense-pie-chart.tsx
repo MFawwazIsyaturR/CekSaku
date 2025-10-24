@@ -1,6 +1,6 @@
 // import * as React from "react";
 import { Label, Pie, PieChart, Cell } from "recharts";
-
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -85,7 +85,9 @@ const ExpensePieChart = (props: { dateRange?: DateRangeType }) => {
   };
 
   return (
-    <Card className="!shadow-none border-1 border-gray-100 dark:border-border">
+    <Card className={cn(
+        "bg-white/60 dark:bg-gray-800/60 backdrop-blur-md shadow-lg rounded-lg border border-white/20 dark:border-gray-700/40 transition-all hover:bg-white/70 dark:hover:bg-gray-800/70"
+    )}>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">Rincian Pengeluaran</CardTitle>
         <CardDescription>Total pengeluaran {dateRange?.label}</CardDescription>
@@ -168,7 +170,7 @@ const ExpensePieChart = (props: { dateRange?: DateRangeType }) => {
 };
 
 const PieChartSkeleton = () => (
-  <Card className="!shadow-none border-1 border-gray-100 dark:border-border">
+  <Card className="border-1 border-gray-100 dark:border-border">
     <CardHeader className="pb-2">
       <Skeleton className="h-6 w-48" />
       <Skeleton className="h-4 w-32 mt-1" />
