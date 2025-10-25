@@ -6,7 +6,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.x-green.svg)](https://www.mongodb.com/)
 [![Express.js](https://img.shields.io/badge/Express.js-5.x-lightgrey.svg)](https://expressjs.com/)
 
-CekSaku adalahWebsite pengelolaan keuangan pribadi yang memudahkan pencatatan dan pengaturan finansial, dengan tujuan membantu pengguna mencapai kebebasan finansial. Tangguh dalam mengelola dan menganalisis data keuangan pribadi, terintegrasi dengan AI untuk wawasan yang lebih cerdas.
+CekSaku adalah Website pengelolaan keuangan pribadi yang memudahkan pencatatan dan pengaturan finansial, dengan tujuan membantu pengguna mencapai kebebasan finansial. Tangguh dalam mengelola dan menganalisis data keuangan pribadi, terintegrasi dengan AI untuk wawasan yang lebih cerdas.
 
 ---
 
