@@ -120,9 +120,29 @@ const LandingPage = () => {
     <>
       <section className="hero-section-gradient relative flex flex-col h-[100vh] items-center justify-center text-slate-50 transition-bg">
         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-4">
+          
           <header className="absolute top-0 left-0 right-0 z-50 flex justify-center pt-6">
-            <nav className="flex items-center justify-between w-full max-w-6xl mx-auto px-6 py-3">
+            <nav className="flex items-center justify-between w-full max-w-6xl mx-auto px-6 py-3"> {/* Tetap justify-between */}
+              {/* Logo di Kiri */}
               <Logo url="/" />
+
+              {/* Tautan Tengah */}
+              <div className="hidden md:flex items-center mr-125 gap-6">
+                <Link
+                  to="/syarat-ketentuan"
+                  className="text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  Syarat & Ketentuan
+                </Link>
+                <Link
+                  to="/kontak"
+                  className="text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  Kontak
+                </Link>
+              </div>
+
+              {/* Tautan Auth di Kanan */}
               <div className="flex items-center gap-6">
                 <Link
                   to={AUTH_ROUTES.SIGN_UP}
@@ -131,8 +151,8 @@ const LandingPage = () => {
                   Daftar
                 </Link>
                 <Link to={AUTH_ROUTES.SIGN_IN} className="flex items-center">
-                  <button className="final-cta-button cursor-pointer !mt-0">
-                    Mulai Sekarang
+                  <button className="final-cta-button cursor-pointer !mt-0 !h-10 !px-4 !text-sm">
+                    Masuk
                   </button>
                 </Link>
               </div>
@@ -344,13 +364,25 @@ const LandingPage = () => {
 
           <div className="footer-separator" />
 
-          <div className="footer-content">
+        <div className="footer-content">
             <div className="footer-links">
-              <div className="left-links">
+              <div className="left-links flex flex-wrap gap-x-6 gap-y-2"> {/* Tambahkan flex-wrap dan gap */}
                 <span>
                   &copy; {new Date().getFullYear()} CekSaku. All rights reserved
                 </span>
+                <Link to="/syarat-ketentuan" className="hover:text-gray-300">
+                  Syarat & Ketentuan
+                </Link>
+                <Link to="/kontak" className="hover:text-gray-300"> {/* <-- Tautan Kontak di Footer */}
+                  Kontak
+                </Link>
+                {/* <Link to="/kebijakan-privasi" className="hover:text-gray-300">
+                  Kebijakan Privasi
+                </Link> */}
               </div>
+               {/* <div className="social-links">
+                  // Link sosial media
+                </div> */}
             </div>
             <div className="footer-disclaimer">
               <p>
@@ -361,7 +393,7 @@ const LandingPage = () => {
               </p>
             </div>
           </div>
-        </section>
+      </section>
       </div>
     </>
   );
