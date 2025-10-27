@@ -127,7 +127,7 @@ const LandingPage = () => {
               <Logo url="/" />
 
               {/* Tautan Tengah */}
-              <div className="hidden md:flex items-center mr-125 gap-6">
+              <div className="hidden md:flex items-center gap-6 bg-black/40 px-4 py-4 rounded-full">
                 <Link
                   to="/syarat-ketentuan"
                   className="text-sm text-gray-300 hover:text-white transition-colors"
@@ -151,7 +151,7 @@ const LandingPage = () => {
                   Daftar
                 </Link>
                 <Link to={AUTH_ROUTES.SIGN_IN} className="flex items-center">
-                  <button className="final-cta-button cursor-pointer !mt-0 !h-10 !px-4 !text-sm">
+                  <button className="final-cta-button cursor-pointer !mt-0 !h-10 !px-6 !py-2 !text-sm">
                     Masuk
                   </button>
                 </Link>
