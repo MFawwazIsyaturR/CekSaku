@@ -34,23 +34,14 @@ const ContactPage = () => {
             {/* Nomor Telepon */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-3">
               <Phone className="w-6 h-6 text-blue-400" />
-              <a
-                href={`tel:${phoneNumber.replace(/\s/g, "")}`} // Format untuk tautan telepon
-                className="text-lg text-white hover:text-blue-300 transition-colors"
-              >
-                {phoneNumber}
-              </a>
+              {phoneNumber}
             </div>
 
             {/* Alamat Email */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-3">
               <Mail className="w-6 h-6 text-blue-400" />
-              <a
-                href={`mailto:${emailAddress}`}
-                className="text-lg text-white hover:text-blue-300 transition-colors break-all" // break-all untuk email panjang
-              >
-                {emailAddress}
-              </a>
+
+              {emailAddress}
             </div>
           </div>
 
@@ -59,12 +50,18 @@ const ContactPage = () => {
           </p>
         </div>
       </main>
-        {/* Footer sederhana di halaman kontak */}
-        <footer className="py-6 border-t border-gray-700 mt-16">
-            <div className="container mx-auto text-center text-sm text-gray-500">
-                 &copy; {new Date().getFullYear()} CekSaku. All rights reserved. | <Link to="/syarat-ketentuan" className="hover:text-gray-300 underline">Syarat & Ketentuan</Link>
-            </div>
-        </footer>
+      {/* Footer sederhana di halaman kontak */}
+      <footer className="py-6 border-t border-gray-700 mt-16">
+        <div className="container mx-auto text-center text-sm text-gray-500">
+          &copy; {new Date().getFullYear()} CekSaku. All rights reserved. |{" "}
+          <Link
+            to="/syarat-ketentuan"
+            className="hover:text-gray-300 underline"
+          >
+            Syarat & Ketentuan
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 };

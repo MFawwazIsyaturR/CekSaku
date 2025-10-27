@@ -123,7 +123,7 @@ const handleGitHubLoginClick = () => {
                     <FormControl>
                       <div className="relative">
                         <Input
-                          placeholder="••••••••"
+                          placeholder="Masukkan Kata Sandi"
                           type={showPassword ? "text" : "password"}
                           {...field}
                           className="text-white rounded-lg focus:ring-gray-600 focus:border-gray-600 border-none
@@ -153,7 +153,7 @@ const handleGitHubLoginClick = () => {
                         to={AUTH_ROUTES.FORGOT_PASSWORD}
                         className="text-sm font-medium text-gray-400 hover:text-white"
                       >
-                        Lupa kata sandi?
+                        Lupa password?
                       </Link>
                     </div>
 
