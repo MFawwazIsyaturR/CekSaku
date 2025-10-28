@@ -1,5 +1,3 @@
-// client/src/pages/legal/TermsAndConditions.tsx
-
 import Logo from "@/components/logo/logo";
 import { AUTH_ROUTES } from "@/routes/common/routePath";
 import { Link } from "react-router-dom";
@@ -24,7 +22,7 @@ const TermsAndConditions = () => {
             Syarat dan Ketentuan
           </h1>
           <p className="text-gray-400 mb-8">
-            Terakhir diperbarui: 27 Oktober 2025 {/* Ganti dengan tanggal update Anda */}
+            Terakhir diperbarui: 27 Oktober 2025
           </p>
 
           <div className="space-y-8 text-gray-300 leading-relaxed">
@@ -123,7 +121,6 @@ const TermsAndConditions = () => {
                 pembayaran Midtrans. Semua faktur akan dikirim ke alamat email Anda yang ditentukan sebagai bagian
                 dari proses registrasi.
               </p>
-              {/* Tambahkan klausul spesifik Midtrans jika diperlukan */}
               <p className="mt-2">
                 Pembayaran diproses melalui Midtrans. Dengan menggunakan layanan berbayar kami,
                 Anda juga setuju untuk terikat oleh Syarat dan Ketentuan Midtrans.
