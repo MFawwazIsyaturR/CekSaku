@@ -17,6 +17,7 @@ import { initializeCrons } from "./cron";
 import reportRoutes from "./routes/report.route";
 import { getDateRange } from "./utils/date";
 import analyticsRoutes from "./routes/analytics.route";
+import connectDB from "./config/database.config";
 
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
@@ -51,12 +52,8 @@ app.use(`${BASE_PATH}/analytics`, passportAuthenticateJwt, analyticsRoutes);
 
 app.use(errorHandler);
 
-app.listen(Env.PORT, async () => {
-  await connctDatabase();
+// Inisialisasi koneksi database saat server cold start
+connectDB();
 
-  if (Env.NODE_ENV === "development") {
-    await initializeCrons();
-  }
-
-  console.log(`Server is running on port ${Env.PORT} in ${Env.NODE_ENV} mode`);
-});
+// Ekspor app agar Vercel bisa menjalankannya
+export default app;
