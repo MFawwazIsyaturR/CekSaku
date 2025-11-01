@@ -55,5 +55,4 @@ app.use(errorHandler);
 // Inisialisasi koneksi database saat server cold start
 connectDB();
 
-// Ekspor app agar Vercel bisa menjalankannya
-export default app;
+module.exports = app;
