@@ -1,78 +1,162 @@
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge"; 
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { Check, X } from "lucide-react";
+import { useState } from "react";
 
-const Billing = () => {
+type PlanFeature = {
+  text: string;
+  footnote?: string;
+  negative?: boolean;
+};
+
+const features: PlanFeature[] = [
+  { text: "Unlimited transactions" },
+  { text: "Unlimited accounts" },
+  { text: "Unlimited budgets" },
+  { text: "Unlimited categories" },
+  { text: "AI receipt scanning", footnote: "10 scans per month" },
+  { text: "Advanced analytics" },
+  { text: "Export data (CSV, PDF)" },
+  { text: "Priority support" },
+];
+
+const plans = [
+  {
+    name: "Free",
+    price: 0,
+    features: features.slice(0, 4),
+    isMostPopular: false,
+    isCurrent: true,
+  },
+  {
+    name: "Pro",
+    price: 75000,
+    features: features,
+    isMostPopular: true,
+    isCurrent: false,
+  },
+];
+
+function PlanFeature({ text, footnote, negative }: PlanFeature) {
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Tagihan</h3>
-        <p className="text-sm text-muted-foreground">
-          Kelola langganan dan informasi penagihan Anda
-        </p>
-      </div>
-      <Separator />
+    <li className="flex items-center gap-2">
+      {negative ? (
+        <X className="h-4 w-4 text-muted-foreground" />
+      ) : (
+        <Check className="h-4 w-4 text-primary" />
+      )}
+      <span
+        className={cn("text-sm", { "text-muted-foreground": negative })}
+      >
+        {text}
+      </span>
+      {footnote && (
+        <span className="ml-1 text-xs text-muted-foreground">({footnote})</span>
+      )}
+    </li>
+  );
+}
 
-      <div className="w-full">
-        {/* Current Plan */}
-        {/* Upgrade Options */}
-        <div className="mt-0">
-          <h1 className="text-lg font-medium mb-2">Dukung Kami</h1>
-          <p className="text-base mb-2">
-            Fitur Penagihan adalah bagian dari <strong>versi lanjutan</strong>{" "}
-            proyek ini. Butuh <strong>minggu dan bulan</strong> untuk merancang,
-            membangun, dan menyempurnakannya..
-          </p>
+function Billing() {
+  const [isYearly, setIsYearly] = useState(false);
+  const toggleBilling = () => setIsYearly(!isYearly);
 
-          <p className="text-base mb-2">
-            Dengan mendukung kami, Anda akan membuka fitur penagihan premium,
-            termasuk:
-          </p>
-
-          <ul className="list-disc pl-5 text-base mb-2">
-            <li>
-              <strong>Uji Coba Gratis + Langganan Stripe</strong>
-            </li>
-            <li>
-              <strong>Paket Bulanan & Tahunan</strong> bawaan
-            </li>
-            <li>
-              <strong>Beralih antar paket</strong> (bulanan ↔ tahunan)
-            </li>
-            <li>
-              <strong>Kelola & Batalkan Langganan</strong> kapan saja
-            </li>
-            <li>
-              <strong>Video Panduan Langkah demi Langkah</strong>
-            </li>
-            <li>
-              <strong>Kode Sumber Lengkap</strong>
-            </li>
-            <li>
-              <strong>Deployment Siap Produksi</strong>
-            </li>
-          </ul>
-
-          <p className="text-base mb-2">
-            Dukungan Anda membantu kami terus membangun proyek berkualitas
-            tinggi secara gratis untuk komunitas.
-          </p>
-
-          <p className="text-base font-medium">
-            🔓 <span className="text-green-600">Dapatkan disini:</span>
-            <a
-              className="text-blue-500 underline ml-1"
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
+  return (
+    <div className="p-1">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-8 flex justify-center">
+          <div
+            onClick={toggleBilling}
+            className="inline-flex cursor-pointer items-center rounded-full bg-muted p-1"
+          >
+            <Button
+              variant={!isYearly ? "default" : "ghost"}
+              size="sm"
+              className="rounded-full"
             >
-              Klik Disini
-            </a>
-          </p>
-          <br />
-          <br />
+              Monthly
+            </Button>
+            <Button
+              variant={isYearly ? "default" : "ghost"}
+              size="sm"
+              className="rounded-full"
+            >
+              Yearly (Save 20%)
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          {plans.map((plan) => (
+            <Card
+              key={plan.name}
+              className={cn("flex flex-col", {
+                "border-2 border-primary shadow-lg": plan.isMostPopular,
+              })}
+            >
+              <CardHeader className="relative">
+                {plan.isMostPopular && (
+                  <Badge className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    Most Popular
+                  </Badge>
+                )}
+                <CardTitle>{plan.name}</CardTitle>
+                <CardDescription>
+                  <span className="text-3xl font-bold">
+                    {isYearly
+                      ? `Rp${(plan.price * 12 * 0.8).toLocaleString("id-ID")}`
+                      : `Rp${plan.price.toLocaleString("id-ID")}`}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {plan.price > 0 ? (isYearly ? "/year" : "/month") : ""}
+                  </span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1">
+                <ul className="space-y-2">
+                  {plan.features.map((feature) => (
+                    <PlanFeature key={feature.text} {...feature} />
+                  ))}
+                  {plan.name === "Free" &&
+                    features
+                      .slice(4)
+                      .map((feature) => (
+                        <PlanFeature
+                          key={feature.text}
+                          {...feature}
+                          negative
+                        />
+                      ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  disabled={plan.isCurrent}
+                  variant={plan.isMostPopular ? "default" : "outline"}
+                >
+                  {plan.isCurrent
+                    ? "Current Plan"
+                    : plan.name === "Free"
+                    ? "Downgrade"
+                    : "Upgrade to Pro"}
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default Billing;
