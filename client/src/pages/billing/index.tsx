@@ -1,4 +1,6 @@
-import { Badge } from "@/components/ui/badge"; 
+import PageHeader from "@/components/page-header";
+import PageLayout from "@/components/page-layout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,12 +14,14 @@ import { cn } from "@/lib/utils";
 import { Check, X } from "lucide-react";
 import { useState } from "react";
 
+// Tipe data untuk fitur, persis seperti di landing page
 type PlanFeature = {
   text: string;
   footnote?: string;
   negative?: boolean;
 };
 
+// Definisi fitur, persis seperti di landing page
 const features: PlanFeature[] = [
   { text: "Unlimited transactions" },
   { text: "Unlimited accounts" },
@@ -29,23 +33,25 @@ const features: PlanFeature[] = [
   { text: "Priority support" },
 ];
 
+// Definisi plans, persis seperti di landing page
 const plans = [
   {
     name: "Free",
     price: 0,
     features: features.slice(0, 4),
     isMostPopular: false,
-    isCurrent: true,
+    isCurrent: true, // Nanti ini bisa diganti data dari user
   },
   {
     name: "Pro",
     price: 75000,
     features: features,
     isMostPopular: true,
-    isCurrent: false,
+    isCurrent: false, // Nanti ini bisa diganti data dari user
   },
 ];
 
+// Komponen kecil untuk render list fitur, persis seperti di landing page
 function PlanFeature({ text, footnote, negative }: PlanFeature) {
   return (
     <li className="flex items-center gap-2">
@@ -66,13 +72,24 @@ function PlanFeature({ text, footnote, negative }: PlanFeature) {
   );
 }
 
-function Billing() {
+// --- Komponen Halaman Billing ---
+function BillingPage() {
+  // State untuk toggle, persis seperti di landing page
   const [isYearly, setIsYearly] = useState(false);
   const toggleBilling = () => setIsYearly(!isYearly);
 
   return (
-    <div className="p-1">
+    <PageLayout>
+      {/* === PERBAIKAN DI SINI === */}
+      <PageHeader title="Upgrade Your Plan" />
+      <p className="text-muted-foreground -mt-4 mb-6">
+        Choose the plan that fits your needs and unlock Pro features.
+      </p>
+      {/* === AKHIR PERBAIKAN === */}
+
+      {/* Ini adalah salinan langsung dari JSX di file PricingSection.tsx */}
       <div className="mx-auto max-w-5xl">
+        {/* Toggle Button */}
         <div className="mb-8 flex justify-center">
           <div
             onClick={toggleBilling}
@@ -95,6 +112,7 @@ function Billing() {
           </div>
         </div>
 
+        {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {plans.map((plan) => (
             <Card
@@ -126,6 +144,7 @@ function Billing() {
                   {plan.features.map((feature) => (
                     <PlanFeature key={feature.text} {...feature} />
                   ))}
+                  {/* Tambahkan fitur 'grayed-out' untuk 'Free' plan */}
                   {plan.name === "Free" &&
                     features
                       .slice(4)
@@ -147,7 +166,7 @@ function Billing() {
                   {plan.isCurrent
                     ? "Current Plan"
                     : plan.name === "Free"
-                    ? "Downgrade"
+                    ? "Downgrade" // Seharusnya tidak terjadi, tapi untuk kelengkapan
                     : "Upgrade to Pro"}
                 </Button>
               </CardFooter>
@@ -155,8 +174,8 @@ function Billing() {
           ))}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }
 
-export default Billing;
+export default BillingPage;

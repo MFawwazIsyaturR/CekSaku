@@ -15,6 +15,7 @@ import Security from "@/pages/settings/security";
 import GoogleCallback from "@/pages/auth/GoogleCallback";
 import TermsAndConditions from "@/pages/landing/TermsAndConditions";
 import ContactPage from "@/pages/landing/ContactPage";
+import BillingPage from "@/pages/billing";
 
 export const authenticationRoutePaths = [
   { path: AUTH_ROUTES.LANDING, element: <LandingPage /> },
@@ -31,6 +32,7 @@ export const protectedRoutePaths = [
   { path: PROTECTED_ROUTES.OVERVIEW, element: <Dashboard /> },
   { path: PROTECTED_ROUTES.TRANSACTIONS, element: <Transactions /> },
   { path: PROTECTED_ROUTES.REPORTS, element: <Reports /> },
+  { path: PROTECTED_ROUTES.BILLING, element: <BillingPage /> },
   {
     path: PROTECTED_ROUTES.SETTINGS,
     element: <Settings />,
