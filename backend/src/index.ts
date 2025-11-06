@@ -55,4 +55,17 @@ app.use(errorHandler);
 // Inisialisasi koneksi database saat server cold start
 connectDB();
 
+if (Env.NODE_ENV !== "production") {
+  app.listen(Env.PORT, async () => {
+    // connectDB() sudah dipanggil di atas,
+    // tapi kita jalankan cron HANYA di dev
+    if (Env.NODE_ENV === "development") {
+      await initializeCrons();
+    }
+    console.log(
+      `Server is running on port ${Env.PORT} in ${Env.NODE_ENV} mode`,
+    );
+  });
+}
+
 module.exports = app;
