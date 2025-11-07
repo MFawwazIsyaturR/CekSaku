@@ -1,5 +1,3 @@
-import PageHeader from "@/components/page-header";
-import PageLayout from "@/components/page-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,46 +10,83 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Check, X } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 
-// Tipe data untuk fitur, persis seperti di landing page
+/* =========================================================
+   ============= PENGGANTI UNTUK KOMPONEN LAYOUT ==========
+   =========================================================
+   Komponen PageLayout dan PageHeader bersifat sementara
+   sebagai pengganti jika versi asli belum tersedia.
+   Fungsinya untuk membungkus halaman dan menampilkan judul.
+*/
+
+// Layout sederhana agar konten berada di tengah
+const PageLayout = ({ children }: { children: React.ReactNode }) => (
+  <div className="container mx-auto py-8 px-4">{children}</div>
+);
+
+// Header sederhana untuk menampilkan judul halaman
+const PageHeader = ({ title }: { title: string }) => (
+  <h1 className="text-3xl font-bold tracking-tight mb-4">{title}</h1>
+);
+
+/* =========================================================
+   ================== DEFINISI TIPE DATA ===================
+   =========================================================
+   Tipe `PlanFeature` merepresentasikan satu fitur dalam paket.
+   Fitur bisa memiliki catatan tambahan (footnote) dan status negatif
+   jika tidak tersedia di paket tertentu.
+*/
 type PlanFeature = {
-  text: string;
-  footnote?: string;
-  negative?: boolean;
+  text: string;        // Nama fitur
+  footnote?: string;   // Catatan tambahan (opsional)
+  negative?: boolean;  // Apakah fitur tidak tersedia
 };
 
-// Definisi fitur, persis seperti di landing page
+/* =========================================================
+   ==================== DATA FITUR PLAN ====================
+   =========================================================
+   Daftar fitur yang ditawarkan tiap paket.
+*/
 const features: PlanFeature[] = [
-  { text: "Unlimited transactions" },
-  { text: "Unlimited accounts" },
-  { text: "Unlimited budgets" },
-  { text: "Unlimited categories" },
-  { text: "AI receipt scanning", footnote: "10 scans per month" },
-  { text: "Advanced analytics" },
-  { text: "Export data (CSV, PDF)" },
-  { text: "Priority support" },
+  { text: "Transaksi tak terbatas" },
+  { text: "Akun tak terbatas" },
+  { text: "Anggaran tak terbatas" },
+  { text: "Kategori tak terbatas" },
+  { text: "Pemindaian struk dengan AI", footnote: "10 pemindaian per bulan" },
+  { text: "Analitik lanjutan" },
+  { text: "Ekspor data (CSV, PDF)" },
+  { text: "Dukungan prioritas" },
 ];
 
-// Definisi plans, persis seperti di landing page
+/* =========================================================
+   ====================== DATA PLAN ========================
+   =========================================================
+   Dua paket utama: Gratis dan Pro, lengkap dengan harga,
+   fitur, dan status popularitas.
+*/
 const plans = [
   {
-    name: "Free",
+    name: "Gratis",
     price: 0,
     features: features.slice(0, 4),
     isMostPopular: false,
-    isCurrent: true, // Nanti ini bisa diganti data dari user
+    isCurrent: true,
   },
   {
     name: "Pro",
-    price: 75000,
+    price: 19999,
     features: features,
     isMostPopular: true,
-    isCurrent: false, // Nanti ini bisa diganti data dari user
+    isCurrent: false,
   },
 ];
 
-// Komponen kecil untuk render list fitur, persis seperti di landing page
+/* =========================================================
+   =================== KOMPONEN FITUR ======================
+   =========================================================
+   Menampilkan fitur dalam bentuk list dengan ikon cek/tidak.
+*/
 function PlanFeature({ text, footnote, negative }: PlanFeature) {
   return (
     <li className="flex items-center gap-2">
@@ -60,9 +95,7 @@ function PlanFeature({ text, footnote, negative }: PlanFeature) {
       ) : (
         <Check className="h-4 w-4 text-primary" />
       )}
-      <span
-        className={cn("text-sm", { "text-muted-foreground": negative })}
-      >
+      <span className={cn("text-sm", { "text-muted-foreground": negative })}>
         {text}
       </span>
       {footnote && (
@@ -72,47 +105,53 @@ function PlanFeature({ text, footnote, negative }: PlanFeature) {
   );
 }
 
-// --- Komponen Halaman Billing ---
+/* =========================================================
+   =================== HALAMAN BILLING =====================
+   =========================================================
+   Halaman untuk menampilkan paket langganan pengguna.
+   Tersedia pilihan bulanan dan tahunan dengan diskon 20%.
+*/
 function BillingPage() {
-  // State untuk toggle, persis seperti di landing page
+  // State untuk menentukan mode pembayaran: bulanan / tahunan
   const [isYearly, setIsYearly] = useState(false);
+
+  // Fungsi toggle antara Bulanan ↔ Tahunan
   const toggleBilling = () => setIsYearly(!isYearly);
 
   return (
     <PageLayout>
-      {/* === PERBAIKAN DI SINI === */}
-      <PageHeader title="Upgrade Your Plan" />
+      {/* ==================== HEADER HALAMAN ==================== */}
+      <PageHeader title="Tingkatkan paket Anda" />
       <p className="text-muted-foreground -mt-4 mb-6">
-        Choose the plan that fits your needs and unlock Pro features.
+        Pilih paket yang sesuai dengan kebutuhanmu dan dapatkan fitur Pro
       </p>
-      {/* === AKHIR PERBAIKAN === */}
 
-      {/* Ini adalah salinan langsung dari JSX di file PricingSection.tsx */}
+      {/* ==================== TOGGLE PLAN ==================== */}
       <div className="mx-auto max-w-5xl">
-        {/* Toggle Button */}
         <div className="mb-8 flex justify-center">
+          {/* Tombol toggle antara Bulanan dan Tahunan */}
           <div
             onClick={toggleBilling}
-            className="inline-flex cursor-pointer items-center rounded-full bg-muted p-1"
+            className="inline-flex cursor-pointer items-center rounded-full p-1"
           >
             <Button
               variant={!isYearly ? "default" : "ghost"}
               size="sm"
               className="rounded-full"
             >
-              Monthly
+              Bulanan
             </Button>
             <Button
               variant={isYearly ? "default" : "ghost"}
               size="sm"
               className="rounded-full"
             >
-              Yearly (Save 20%)
+              Tahunan
             </Button>
           </div>
         </div>
 
-        {/* Pricing Cards Grid */}
+        {/* ==================== GRID PLAN ==================== */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {plans.map((plan) => (
             <Card
@@ -121,31 +160,35 @@ function BillingPage() {
                 "border-2 border-primary shadow-lg": plan.isMostPopular,
               })}
             >
+              {/* ===== HEADER KARTU PLAN ===== */}
               <CardHeader className="relative">
                 {plan.isMostPopular && (
                   <Badge className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    Most Popular
+                    Paling Populer
                   </Badge>
                 )}
                 <CardTitle>{plan.name}</CardTitle>
                 <CardDescription>
                   <span className="text-3xl font-bold">
                     {isYearly
-                      ? `Rp${(plan.price * 12 * 0.8).toLocaleString("id-ID")}`
+                      ? `Rp${(plan.price * 12).toLocaleString("id-ID")}`
                       : `Rp${plan.price.toLocaleString("id-ID")}`}
                   </span>
                   <span className="text-muted-foreground">
-                    {plan.price > 0 ? (isYearly ? "/year" : "/month") : ""}
+                    {plan.price > 0 ? (isYearly ? "/tahun" : "/bulan") : ""}
                   </span>
                 </CardDescription>
               </CardHeader>
+
+              {/* ===== DAFTAR FITUR PLAN ===== */}
               <CardContent className="flex-1">
                 <ul className="space-y-2">
                   {plan.features.map((feature) => (
                     <PlanFeature key={feature.text} {...feature} />
                   ))}
-                  {/* Tambahkan fitur 'grayed-out' untuk 'Free' plan */}
-                  {plan.name === "Free" &&
+
+                  {/* Fitur tidak tersedia di Free plan */}
+                  {plan.name === "Gratis" &&
                     features
                       .slice(4)
                       .map((feature) => (
@@ -157,6 +200,8 @@ function BillingPage() {
                       ))}
                 </ul>
               </CardContent>
+
+              {/* ===== TOMBOL ACTION ===== */}
               <CardFooter>
                 <Button
                   className="w-full"
@@ -164,10 +209,10 @@ function BillingPage() {
                   variant={plan.isMostPopular ? "default" : "outline"}
                 >
                   {plan.isCurrent
-                    ? "Current Plan"
-                    : plan.name === "Free"
-                    ? "Downgrade" // Seharusnya tidak terjadi, tapi untuk kelengkapan
-                    : "Upgrade to Pro"}
+                    ? "Paket Saat Ini"
+                    : plan.name === "Gratis"
+                    ? "Downgrade"
+                    : "Upgrade ke Pro"}
                 </Button>
               </CardFooter>
             </Card>

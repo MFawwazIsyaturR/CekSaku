@@ -1,25 +1,67 @@
 import { Outlet } from "react-router-dom";
+import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar/Sidebar";
-import EditTransactionDrawer from "@/components/transaction/edit-transaction-drawer";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
-const AppLayout = () => {
+/**
+ * Komponen AppLayout
+ * -------------------
+ * Komponen ini berfungsi sebagai *layout utama* aplikasi setelah pengguna login.
+ * Menyusun struktur halaman yang terdiri dari:
+ * - Sidebar (navigasi utama)
+ * - Navbar (header aplikasi)
+ * - Outlet (konten halaman yang dinamis tergantung route)
+ */
+function AppLayout() {
+  /**
+   * State global layout untuk mengatur kondisi sidebar.
+   * - `true`: sidebar terbuka (expanded)
+   * - `false`: sidebar tertutup (collapsed)
+   */
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   return (
-    <>
-      {/* Container utama tetap flex */}
-      <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-        <Sidebar />
+    <div
+      className={cn(
+        // Grid utama dengan dua kolom: sidebar + konten
+        "grid min-h-screen w-full transition-all duration-300 ease-in-out",
+        // Ubah lebar kolom sidebar secara responsif saat toggle aktif
+        isSidebarOpen
+          ? "md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]"
+          : "md:grid-cols-[72px_1fr]"
+      )}
+    >
+      {/* ============================================
+          =============== SIDEBAR AREA ===============
+          ============================================
+          Sidebar hanya ditampilkan di layar medium ke atas (md+).
+          Status buka/tutup dikontrol oleh state isSidebarOpen.
+      */}
+     <div className="hidden border-r bg-background md:block relative z-40">
+  <Sidebar isSidebarOpen={isSidebarOpen} />
+</div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Terapkan gradasi di sini */}
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-b from-blue-50 to-white dark:from-blue-900/30 dark:to-gray-900">
-            <Outlet />
-          </main>
-        </div>
+
+      {/* ============================================
+          =============== MAIN CONTENT ===============
+          ============================================
+          Bagian kanan layout berisi:
+          - Navbar di bagian atas
+          - Konten halaman (Outlet dari react-router)
+      */}
+      <div className="flex flex-col">
+        {/* Navbar menerima state dan fungsi toggle sidebar */}
+        <Navbar
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
+
+        {/* Outlet menampilkan komponen halaman sesuai rute aktif */}
+        <Outlet />
       </div>
-      <EditTransactionDrawer />
-    </>
+    </div>
   );
-};
+}
 
 export default AppLayout;
