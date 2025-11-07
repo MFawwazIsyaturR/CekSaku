@@ -1,24 +1,13 @@
+// client/src/layouts/app-layout.tsx
+
 import { Outlet } from "react-router-dom";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar/Sidebar";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import MobileBottomNavbar from "@/components/navbar/MobileBottomNavbar"; 
 
-/**
- * Komponen AppLayout
- * -------------------
- * Komponen ini berfungsi sebagai *layout utama* aplikasi setelah pengguna login.
- * Menyusun struktur halaman yang terdiri dari:
- * - Sidebar (navigasi utama)
- * - Navbar (header aplikasi)
- * - Outlet (konten halaman yang dinamis tergantung route)
- */
 function AppLayout() {
-  /**
-   * State global layout untuk mengatur kondisi sidebar.
-   * - `true`: sidebar terbuka (expanded)
-   * - `false`: sidebar tertutup (collapsed)
-   */
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
@@ -35,31 +24,43 @@ function AppLayout() {
       {/* ============================================
           =============== SIDEBAR AREA ===============
           ============================================
-          Sidebar hanya ditampilkan di layar medium ke atas (md+).
-          Status buka/tutup dikontrol oleh state isSidebarOpen.
       */}
      <div className="hidden border-r bg-background md:block relative z-40">
-  <Sidebar isSidebarOpen={isSidebarOpen} />
-</div>
+      <Sidebar isSidebarOpen={isSidebarOpen} />
+     </div>
 
 
       {/* ============================================
           =============== MAIN CONTENT ===============
           ============================================
-          Bagian kanan layout berisi:
-          - Navbar di bagian atas
-          - Konten halaman (Outlet dari react-router)
       */}
-      <div className="flex flex-col">
+      {/* PERBAIKAN: Tambahkan 'min-w-0' pada div ini.
+        Ini adalah kolom grid utama untuk konten. 'min-w-0' akan
+        memastikan bahwa jika konten di dalamnya (seperti tabel)
+        terlalu lebar, konten itu akan dipaksa untuk scroll
+        secara internal (karena tabel sudah punya 'overflow-x-auto')
+        alih-alih merusak seluruh layout halaman.
+      */}
+      <div className="flex flex-col min-w-0"> 
         {/* Navbar menerima state dan fungsi toggle sidebar */}
         <Navbar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />
 
-        {/* Outlet menampilkan komponen halaman sesuai rute aktif */}
-        <Outlet />
+        {/* Area <main> ini sekarang akan di-scroll secara vertikal
+          dan dibatasi lebarnya oleh 'min-w-0' di atas.
+        */}
+        <main className="flex-1 overflow-y-auto bg-gray-100/40 dark:bg-gray-900/50">
+          {/* Wrapper ini memberi padding konsisten */}
+          <div className="p-4 md:p-6 lg:p-8 pb-28 md:pb-8">
+            <Outlet />
+          </div>
+        </main>
       </div>
+      
+      {/* Navbar Bawah Mobile */}
+      <MobileBottomNavbar />
     </div>
   );
 }

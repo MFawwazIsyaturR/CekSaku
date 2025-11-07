@@ -52,7 +52,7 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
       >
         <Logo
           showText={isSidebarOpen}
-          className={cn(!isSidebarOpen && "w-full justify-center")}
+          className={cn( !isSidebarOpen && "w-full justify-center")}
           color="foreground"
         />
       </div>

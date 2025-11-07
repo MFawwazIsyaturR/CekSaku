@@ -145,7 +145,7 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: hidden; 
+  /* overflow-x: hidden;  */
   scrollbar-width: thin; /* 'thin' = tipis, 'auto' = default */
   scrollbar-color: #888 #1e1e1e; /* (1) Warna gagang, (2) Warna track */
 }
