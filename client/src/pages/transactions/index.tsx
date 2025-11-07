@@ -11,6 +11,7 @@ import {
 import AddTransactionDrawer from "@/components/transaction/add-transaction-drawer";
 import TransactionTable from "@/components/transaction/transaction-table";
 import BulkActions from "@/components/transaction/bulk-actions";
+import EditTransactionDrawer from "@/components/transaction/edit-transaction-drawer"; // <-- 1. IMPORT KOMPONEN
 
 export default function Transactions() {
   return (
@@ -47,6 +48,10 @@ export default function Transactions() {
           <TransactionTable pageSize={20} />
         </CardContent>
       </Card>
+
+      {/* 2. RENDER KOMPONEN DI SINI */}
+      {/* Komponen ini akan "mendengarkan" perubahan URL dan tampil saat dibutuhkan */}
+      <EditTransactionDrawer />
     </div>
     // </PageLayout>
   );
