@@ -1,6 +1,7 @@
 import { ReportType } from "../../@types/report.type";
 import { formatCurrency } from "../../utils/format-currency";
 import { capitalizeFirstLetter } from "../../utils/helper";
+import { escapeHtml } from "../../utils/escape-html";
 
 export const getReportEmailTemplate = (
   reportData: ReportType & { username: string },
@@ -49,7 +50,7 @@ export const getReportEmailTemplate = (
               </tr>
               <tr>
                 <td style="padding: 20px 30px;">
-                  <p style="margin: 0 0 10px; font-size: 16px;">Hai <strong>${username}</strong>,</p>
+                  <p style="margin: 0 0 10px; font-size: 16px;">Hai <strong>${escapeHtml(username)}</strong>,</p>
                   <p style="margin: 0 0 20px; font-size: 16px;">Berikut adalah ringkasan keuangan Anda untuk <strong>${period}</strong>.</p>
                   <table width="100%" style="border-collapse: collapse;">
                     <tr>

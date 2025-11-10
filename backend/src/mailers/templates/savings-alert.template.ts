@@ -1,4 +1,5 @@
 import { formatCurrency } from "../../utils/format-currency";
+import { escapeHtml } from "../../utils/escape-html";
 
 type SavingsAlertTemplateData = {
   username: string;
@@ -40,7 +41,7 @@ export const getSavingsAlertEmailTemplate = (data: SavingsAlertTemplateData) => 
              </tr>
              <tr>
                <td style="padding: 20px 30px;">
-                 <p style="margin: 0 0 10px; font-size: 16px;">Halo <strong>${username}</strong>,</p>
+                 <p style="margin: 0 0 10px; font-size: 16px;">Halo <strong>${escapeHtml(username)}</strong>,</p>
                  <p style="margin: 0 0 20px; font-size: 16px;">Ini adalah peringatan mengenai pengeluaran Anda untuk periode gaji <strong>${period}</strong>.</p>
 
                  <p style="font-size: 16px; margin-bottom: 15px;">Anda menetapkan target untuk menabung <strong>${savingsPercentage}%</strong> dari gaji Anda. Ini berarti alokasi dana untuk pengeluaran Anda adalah sekitar <strong>${formatCurrency(nonSavedPortion)}</strong>.</p>

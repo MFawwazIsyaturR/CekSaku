@@ -136,14 +136,14 @@ function BillingPage() {
           >
             <Button
               variant={!isYearly ? "default" : "ghost"}
-              size="sm"
+              size="lg"
               className="rounded-full"
             >
               Bulanan
             </Button>
             <Button
               variant={isYearly ? "default" : "ghost"}
-              size="sm"
+              size="lg"
               className="rounded-full"
             >
               Tahunan

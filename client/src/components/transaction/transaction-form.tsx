@@ -391,7 +391,7 @@ const TransactionForm = (props: {
                   >
                     <FormControl className="w-full">
                       <SelectTrigger>
-                        <SelectValue placeholder="Select payment method" />
+                        <SelectValue placeholder="Pilih metode pembayaran" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -419,7 +419,7 @@ const TransactionForm = (props: {
                     <p className="text-xs text-muted-foreground">
                       {field.value
                         ? "This will repeat automatically"
-                        : "Set recurring to repeat this transaction"}
+                        : "Atur transaksi berulang untuk mengulangi transaksi ini secara berkala"}
                     </p>
                   </div>
                   <FormControl>

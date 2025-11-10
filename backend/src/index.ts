@@ -3,6 +3,7 @@ import "./config/passport.config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import passport from "passport";
+import helmet from "helmet"; // Import helmet
 import { Env } from "./config/env.config";
 import { HTTPSTATUS } from "./config/http.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
@@ -24,6 +25,7 @@ const BASE_PATH = Env.BASE_PATH;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet()); // Use helmet middleware
 
 app.use(passport.initialize());
 
