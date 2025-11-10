@@ -101,7 +101,6 @@ const faqData = [
 ];
 
 const LandingPage = () => {
-  const [isQuoteHovered, setIsQuoteHovered] = useState(false);
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
@@ -301,45 +300,6 @@ const LandingPage = () => {
               </Accordion>
             </div>
           </div>
-        </section>
-        <section className="quote-section my-24 overflow-x-hidden px-4">
-          <ScrollReveal>
-            <div className="mt-10 rounded-xl bg-gradient-to-l from-gray-400 via-gray-600 to-gray-black p-1">
-              <div
-                className="rounded-lg p-8"
-                style={{ backgroundColor: "#0c0c0f" }}
-              >
-                <div className="quote-container">
-                  <div className="quote-text-wrapper">
-                    <blockquote
-                      className="quote-text-interactive"
-                      onMouseEnter={() => setIsQuoteHovered(true)}
-                      onMouseLeave={() => setIsQuoteHovered(false)}
-                    >
-                      {isQuoteHovered ? (
-                        <span className="quote-lang-id">
-                          "<b>Jangan simpan</b> apa yang tersisa{" "}
-                          <b>setelah dibelanjakan</b>; sebaliknya,{" "}
-                          <b>belanjakan</b> apa yang tersisa{" "}
-                          <b>setelah disimpan</b>."
-                        </span>
-                      ) : (
-                        <span className="quote-lang-en">
-                          "<b>Do not save</b> what is left <b>after spending</b>
-                          ; instead <b>spend</b> what is left{" "}
-                          <b>after saving</b>."
-                        </span>
-                      )}
-                    </blockquote>
-                    <cite>— Warren Buffett</cite>
-                  </div>
-                  <div className="quote-image-wrapper">
-                    <img src={warrenBuffettImg} alt="Warren Buffett" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
         </section>
 
         <PricingSection />

@@ -191,25 +191,12 @@ img {
   transform: translateX(-50%);
 }
 
-.quote-image-wrapper img {
-  width: clamp(120px, 35vw, 600px);
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
 .mockup-image-center img {
   max-width: 100%;
   width: auto;
   max-height: 95vh;
   height: auto;
   object-fit: contain;
-}
-
-@media (max-width: 420px) {
-  .quote-text-wrapper blockquote {
-    font-size: 1.4rem; 
-  }
 }
 
 .card-glow {
