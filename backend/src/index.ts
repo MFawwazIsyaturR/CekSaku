@@ -19,6 +19,8 @@ import reportRoutes from "./routes/report.route";
 import { getDateRange } from "./utils/date";
 import analyticsRoutes from "./routes/analytics.route";
 import connectDB from "./config/database.config";
+import { initializeMidtrans } from "./config/midtrans.config";
+import paymentRoutes from "./routes/payment.route";
 
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
@@ -51,11 +53,14 @@ app.use(`${BASE_PATH}/user`, passportAuthenticateJwt, userRoutes);
 app.use(`${BASE_PATH}/transaction`, passportAuthenticateJwt, transactionRoutes);
 app.use(`${BASE_PATH}/report`, passportAuthenticateJwt, reportRoutes);
 app.use(`${BASE_PATH}/analytics`, passportAuthenticateJwt, analyticsRoutes);
+app.use(`${BASE_PATH}/payment`, paymentRoutes);
 
 app.use(errorHandler);
 
 // Inisialisasi koneksi database saat server cold start
 connectDB();
+// Inisialisasi Midtrans
+initializeMidtrans();
 
 if (Env.NODE_ENV !== "production") {
   app.listen(Env.PORT, async () => {

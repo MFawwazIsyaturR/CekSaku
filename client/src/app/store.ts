@@ -12,6 +12,7 @@ import {
   REGISTER,
 } from 'redux-persist'
 import { apiClient } from './api-client';
+import '../features/payment/paymentAPI'; // Import payment API to register endpoints
 //import { encryptTransform } from 'redux-persist-transform-encrypt';
 
 type RootReducerType = ReturnType<typeof rootReducer>;

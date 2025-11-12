@@ -2,7 +2,7 @@ import { addDays, addMonths, addWeeks, addYears, startOfDay, startOfMonth, start
 import { RecurringIntervalEnum } from "../models/transaction.model";
 import { ReportFrequencyEnum } from "../models/report-setting.model";
 
-export function calulateNextReportDate(
+export function calculateNextReportDate(
   frequency: keyof typeof ReportFrequencyEnum,
   lastSentDate?: Date
 ): Date {

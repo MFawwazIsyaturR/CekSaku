@@ -12,7 +12,7 @@ import {
 import ReportSettingModel, {
   ReportFrequencyEnum,
 } from "../models/report-setting.model";
-import { calulateNextReportDate } from "../utils/helper";
+import { calculateNextReportDate } from "../utils/helper";
 import { signJwtToken } from "../utils/jwt";
 import { OAuth2Client } from "google-auth-library";
 import { Env } from "../config/env.config";
@@ -46,7 +46,7 @@ export const registerService = async (body: RegisterSchemaType) => {
         frequency: ReportFrequencyEnum.MONTHLY,
         isEnabled: true,
         // FIX: Tambahkan argumen frekuensi
-        nextReportDate: calulateNextReportDate(ReportFrequencyEnum.MONTHLY), 
+        nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY), 
         lastSentDate: null,
       });
       await reportSetting.save({ session });
@@ -119,7 +119,7 @@ export const googleLoginService = async (code: string) => {
             frequency: ReportFrequencyEnum.MONTHLY,
             isEnabled: true,
             // FIX: Tambahkan argumen frekuensi
-            nextReportDate: calulateNextReportDate(ReportFrequencyEnum.MONTHLY), 
+            nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY), 
             lastSentDate: null,
           });
           await reportSetting.save({ session });
@@ -204,7 +204,7 @@ export const githubLoginService = async (code: string) => {
             frequency: ReportFrequencyEnum.MONTHLY,
             isEnabled: true,
              // FIX: Tambahkan argumen frekuensi
-            nextReportDate: calulateNextReportDate(ReportFrequencyEnum.MONTHLY),
+            nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY),
             lastSentDate: null,
           });
           await reportSetting.save({ session });

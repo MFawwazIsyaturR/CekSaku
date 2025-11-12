@@ -33,6 +33,10 @@ const envConfig = () => ({
 
    GITHUB_CLIENT_ID: getEnv("GITHUB_CLIENT_ID"),
   GITHUB_CLIENT_SECRET: getEnv("GITHUB_CLIENT_SECRET"),
+
+  MIDTRANS_SERVER_KEY: getEnv("MIDTRANS_SERVER_KEY"),
+  MIDTRANS_CLIENT_KEY: getEnv("MIDTRANS_CLIENT_KEY"),
+  MIDTRANS_IS_PRODUCTION: getEnv("MIDTRANS_IS_PRODUCTION", "false"),
 });
 
 export const Env = envConfig();

@@ -84,7 +84,9 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
     return activeCategories;
   }, [location.pathname]);
 
-  // Komponen Link internal untuk menghindari repetisi
+  // ===================================================================
+  // ========= PERUBAHAN UTAMA ADA DI DALAM KOMPONEN NAVLINK INI =========
+  // ===================================================================
   const NavLink = ({
     href,
     icon: Icon,
@@ -99,30 +101,47 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
     <Link
       to={href}
       className={cn(
-        // Gaya dasar: perbesar padding vertikal (py-3) dan HAPUS 'gap-3' dari sini.
-        "flex items-center rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary",
+        // Gaya dasar:
+        "flex items-center rounded-lg px-3 text-muted-foreground transition-all hover:text-primary",
+
+        // [PERUBAHAN 1] Padding vertikal dibuat kondisional
+        // py-2 (lebih kecil) jika isChild, jika tidak py-3 (standar)
+        isChild ? "py-2" : "py-3",
+
         // Gaya item anak (hanya jika sidebar terbuka)
         isChild && isSidebarOpen && "ml-4",
+
         // Beri warna berbeda untuk halaman aktif
         isActive(href) && "bg-muted text-primary",
+
         // Logika untuk alignment & gap
         !isSidebarOpen
           ? "justify-center" // Saat tertutup: HANYA justify-center.
           : "gap-3" // Saat terbuka: BARU tambahkan 'gap-3'.
       )}
     >
-      <Icon className="h-5 w-5" /> {/* Ukuran ikon: h-5 w-5 */}
+      {/* [PERUBAHAN 2] Ukuran ikon dibuat kondisional
+          h-4 w-4 (lebih kecil) jika isChild, jika tidak h-5 w-5 (standar) */}
+      <Icon className={cn(isChild ? "h-4 w-4" : "h-5 w-5")} />
+
       <span
         className={cn(
           "whitespace-nowrap transition-opacity duration-200",
           // [PERBAIKAN FINAL] 'hidden' akan menghapus span dari DOM flow.
-          !isSidebarOpen ? "opacity-0 hidden" : "opacity-100"
+          !isSidebarOpen ? "opacity-0 hidden" : "opacity-100",
+
+          // [PERUBAHAN 3] Ukuran teks dibuat kondisional
+          // text-xs (lebih kecil) jika isChild
+          isChild && "text-xs"
         )}
       >
         {label}
       </span>
     </Link>
   );
+  // ===================================================================
+  // =================== AKHIR DARI PERUBAHAN UTAMA ====================
+  // ===================================================================
 
   return (
     <div className="flex h-full max-h-screen flex-col gap-2">
@@ -174,7 +193,7 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
                   isCategoryActive(planningItems) && "text-primary",
                   // [PERBAIKAN FINAL] Sembunyikan ikon chevron (panah)
                   // bawaan shadcn saat sidebar tertutup.
-                  !isSidebarOpen && "[&>.shrink-0]:hidden"
+                  "[&>.shrink-0]:hidden"
                 )}
               >
                 <ClipboardList className="h-5 w-5" />
@@ -209,7 +228,7 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
                   isCategoryActive(analysisItems) && "text-primary",
                   // [PERBAIKAN FINAL] Sembunyikan ikon chevron (panah)
                   // bawaan shadcn saat sidebar tertutup.
-                  !isSidebarOpen && "[&>.shrink-0]:hidden"
+                  "[&>.shrink-0]:hidden"
                 )}
               >
                 <PieChart className="h-5 w-5" />

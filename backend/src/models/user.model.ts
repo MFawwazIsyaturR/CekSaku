@@ -6,6 +6,10 @@ export interface UserDocument extends Document {
   email: string;
   password: string;
   profilePicture: string | null;
+  subscriptionStatus: 'active' | 'cancelled' | 'pending' | 'expired';
+  subscriptionPlan: string;
+  subscriptionOrderId: string;
+  subscriptionExpiredAt: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword: (password: string) => Promise<boolean>;
@@ -40,6 +44,26 @@ const userSchema = new Schema<UserDocument>(
     timestamps: true,
   }
 );
+
+userSchema.add({
+  subscriptionStatus: {
+    type: String,
+    enum: ['active', 'cancelled', 'pending', 'expired'],
+    default: 'pending',
+  },
+  subscriptionPlan: {
+    type: String,
+    default: 'free',
+  },
+  subscriptionOrderId: {
+    type: String,
+    default: null,
+  },
+  subscriptionExpiredAt: {
+    type: Date,
+    default: null,
+  },
+});
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {

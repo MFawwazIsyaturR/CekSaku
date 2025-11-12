@@ -26,13 +26,13 @@ CekSaku adalah Website pengelolaan keuangan pribadi yang memudahkan pencatatan d
 
 ## 🚀 Tumpukan Teknologi (Tech Stack)
 
-* **Backend:** Node.js, Express.js, TypeScript  
-* **Database:** MongoDB dengan Mongoose  
-* **Autentikasi:** JWT (JSON Web Tokens), Passport.js, bcrypt  
-* **AI:** Google AI (Model Gemini)  
-* **Penyimpanan File:** Cloudinary  
-* **Email:** Resend  
-* **Penjadwalan:** node-cron  
+* **Backend:** Node.js, Express.js, TypeScript
+* **Database:** MongoDB dengan Mongoose
+* **Autentikasi:** JWT (JSON Web Tokens), Passport.js, bcrypt
+* **AI:** Google AI (Model Gemini)
+* **Penyimpanan File:** Cloudinary
+* **Email:** Resend
+* **Penjadwalan:** node-cron
 
 ---
 
@@ -130,7 +130,7 @@ Ikuti langkah-langkah ini untuk menjalankan backend CekSaku secara lokal:
 
 Untuk informasi terperinci tentang endpoint API yang tersedia, format permintaan/respons, dan contoh penggunaan, silakan merujuk ke file controller yang terletak di direktori `backend/src/controllers/`.
 
-**Contoh: Mengambil Data Analitik**  
+**Contoh: Mengambil Data Analitik**
 *(Lihat `analytics.controller.ts` untuk implementasi lengkap)*
 
 ```typescript
@@ -186,38 +186,75 @@ export const summaryAnalyticsController = asyncHandler(
 
 ## 🤝 Pedoman Kontribusi
 
-Kami menyambut kontribusi untuk membuat **CekSaku** menjadi lebih baik!  
+Kami menyambut kontribusi untuk membuat **CekSaku** menjadi lebih baik!
 Ikuti langkah berikut untuk berkontribusi:
 
-1. **Fork** repositori ini.  
-2. **Klon** repositori fork Anda:  
+1. **Fork** repositori ini.
+2. **Klon** repositori fork Anda:
    ```bash
    git clone https://github.com/nama-pengguna-anda/CekSaku.git
    ```
-3. **Buat branch baru** untuk fitur atau perbaikan Anda:  
+3. **Buat branch baru** untuk fitur atau perbaikan Anda:
    ```bash
    git checkout -b fitur/nama-fitur-anda
    ```
-4. **Lakukan perubahan**, tambahkan tes jika perlu.  
-5. **Commit** dengan pesan jelas:  
+4. **Lakukan perubahan**, tambahkan tes jika perlu.
+5. **Commit** dengan pesan jelas:
    ```bash
    git commit -m "fitur: Tambah fitur baru yang luar biasa"
    ```
-6. **Push** ke GitHub dan **kirim Pull Request**.  
+6. **Push** ke GitHub dan **kirim Pull Request**.
 
 Terima kasih atas kontribusinya! 💪
 
 ---
 
-## 📜 Lisensi
+## 💳 Pembayaran & Langganan (Midtrans)
 
-Proyek ini dilisensikan di bawah **Lisensi MIT** – lihat file [LICENSE](https://opensource.org/licenses/MIT) untuk detailnya.
+Aplikasi ini terintegrasi dengan gateway pembayaran Midtrans untuk pembayaran berlangganan. Implementasi mencakup:
+
+- Integrasi backend dengan SDK Node.js Midtrans
+- Integrasi frontend dengan SNAP JS
+- Manajemen langganan
+- Penanganan notifikasi pembayaran
+- Lingkungan sandbox untuk pengujian
+
+### Variabel Lingkungan Pembayaran
+
+Untuk menjalankan aplikasi dengan integrasi pembayaran Midtrans, Anda perlu mengatur variabel lingkungan berikut:
+
+```bash
+# Backend
+MIDTRANS_SERVER_KEY=kunci_server_midtrans_anda_disini
+MIDTRANS_CLIENT_KEY=kunci_klien_midtrans_anda_disini
+MIDTRANS_IS_PRODUCTION=false
+
+# Frontend (Vite)
+VITE_MIDTRANS_CLIENT_KEY=kunci_klien_midtrans_anda_disini
+VITE_MIDTRANS_IS_PRODUCTION=false
+```
+
+Untuk pengujian, Anda dapat menggunakan kredensial sandbox Midtrans. Untuk produksi, gunakan kredensial live.
+
+### Pengujian dengan Sandbox
+
+Aplikasi dikonfigurasi untuk menggunakan lingkungan sandbox Midtrans dalam pengembangan. Untuk menguji alur pembayaran:
+1. Buat akun Midtrans dan aktifkan mode sandbox
+2. Gunakan kredensial sandbox di variabel lingkungan Anda
+3. Akses halaman Billing di aplikasi
+4. Pilih paket berlangganan dan lakukan pembayaran
+5. Gunakan detail kartu kredit uji dari Midtrans untuk pengujian
+
+Untuk pengujian kartu kredit di sandbox:
+- Nomor kartu: 4811 1111 1111 1114
+- CVV: 123
+- Kedaluwarsa: 12/25 (atau tanggal masa depan lainnya)
 
 ---
 
 ## 🙏 Ucapan Terima Kasih
 
-* Dibangun dengan alat dan pustaka open-source yang luar biasa.  
-* Terima kasih khusus kepada pengembang **Express.js**, **TypeScript**, **MongoDB**, **Passport.js**, **Google AI**, **Cloudinary**, **Resend**, dan semua dependensi lainnya.
+* Dibangun dengan alat dan pustaka open-source yang luar biasa.
+* Terima kasih khusus kepada pengembang **Express.js**, **TypeScript**, **MongoDB**, **Passport.js**, **Google AI**, **Cloudinary**, **Resend**, **Midtrans**, dan semua dependensi lainnya.
 
 ---
