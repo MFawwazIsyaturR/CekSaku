@@ -58,7 +58,7 @@ const Logo = (props: LogoProps) => {
         className={cn(
           "whitespace-nowrap text-lg transition-all duration-200 ease-in-out",
           `text-${logoTextColor}`,
-          showText ? "w-auto opacity-100" : "w-0 opacity-0"
+          showText ? "w-auto opacity-100" : "w-0 opacity-0 hidden"
         )}
       >
         CekSaku
