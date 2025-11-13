@@ -7,6 +7,8 @@ import {
   googleLoginController,
   loginController,
   registerController,
+  refreshController,
+  logoutController,
 } from "../controllers/auth.controller";
 import rateLimit from "express-rate-limit";
 
@@ -59,5 +61,7 @@ authRoutes.post("/forgot-password", strictAuthLimiter, forgotPasswordController)
 authRoutes.post("/verify-reset-token", resetTokenLimiter, verifyResetTokenController);
 authRoutes.post("/reset-password", resetTokenLimiter, resetPasswordController);
 
+authRoutes.post("/refresh-token", refreshController);
+authRoutes.post("/logout", logoutController);
 
 export default authRoutes;

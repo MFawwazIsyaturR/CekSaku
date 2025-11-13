@@ -284,3 +284,29 @@ export const resetPasswordService = async (token: string, newPassword: string) =
     await PasswordResetTokenModel.findByIdAndDelete(validRecord._id);
     return { message: "Password has been reset successfully." };
 };
+
+export const refreshTokenService = async (userId: string) => {
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+
+  const { token, expiresAt } = signJwtToken({ userId: user.id });
+  const reportSetting = await ReportSettingModel.findOne(
+    { userId: user.id },
+    { _id: 1, frequency: 1, isEnabled: 1 }
+  ).lean();
+
+  return {
+    user: user.omitPassword(),
+    accessToken: token,
+    expiresAt,
+    reportSetting,
+  };
+};
+
+export const logoutService = async (userId: string) => {
+  // In a real application, you might want to implement token blacklisting
+  // For now, we just return a success message
+  return { message: "User logged out successfully" };
+};
