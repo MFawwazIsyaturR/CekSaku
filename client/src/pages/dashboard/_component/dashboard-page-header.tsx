@@ -16,7 +16,7 @@ const DashboardPageHeader = ({ dateRange, setDateRange }: Props) => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Top Row: Welcome Message */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-white">

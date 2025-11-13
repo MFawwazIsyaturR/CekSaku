@@ -11,6 +11,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Check, X } from "lucide-react";
 import React, { useState } from "react";
+import { useTypedSelector } from "@/app/hook";
+import { useCreateSubscriptionPaymentMutation } from "@/features/payment/paymentAPI";
 
 /* =========================================================
    ============= PENGGANTI UNTUK KOMPONEN LAYOUT ==========
@@ -65,7 +67,18 @@ const features: PlanFeature[] = [
    Dua paket utama: Gratis dan Pro, lengkap dengan harga,
    fitur, dan status popularitas.
 */
-const plans = [
+// Define the type for our plans
+interface Plan {
+  name: string;
+  price: number;  // Monthly price
+  originalPrice?: number;
+  yearlyPrice?: number;  // Yearly price without discount
+  features: PlanFeature[];
+  isMostPopular: boolean;
+  isCurrent: boolean;
+}
+
+const plans: Plan[] = [
   {
     name: "Gratis",
     price: 0,
@@ -76,6 +89,8 @@ const plans = [
   {
     name: "Pro",
     price: 19999,
+    originalPrice: 19999,
+    yearlyPrice: 19999 * 12, // Yearly price without discount
     features: features,
     isMostPopular: true,
     isCurrent: false,
@@ -114,9 +129,95 @@ function PlanFeature({ text, footnote, negative }: PlanFeature) {
 function BillingPage() {
   // State untuk menentukan mode pembayaran: bulanan / tahunan
   const [isYearly, setIsYearly] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { user } = useTypedSelector((state) => state.auth);
+
+  const [createSubscriptionPayment, { isLoading: isCreatingPayment }] = useCreateSubscriptionPaymentMutation();
 
   // Fungsi toggle antara Bulanan ↔ Tahunan
   const toggleBilling = () => setIsYearly(!isYearly);
+
+  const handlePayment = async (plan: typeof plans[0]) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Double-check that user exists, in case the UI state wasn't accurate
+      if (!user?.id && !user?._id) {
+        setError('User not authenticated. Please log in first.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Calculate the actual price based on billing cycle (monthly vs yearly)
+      const price = isYearly 
+        ? (plan.yearlyPrice || plan.price * 12) 
+        : plan.price;
+      const period = isYearly ? 'tahun' : 'bulan';
+      const planName = `${plan.name} Plan ${isYearly ? '(Tahunan)' : '(Bulanan)'}`;
+
+      // Validate that required fields are not empty/null
+      if (!price || price <= 0) {
+        setError('Invalid price for the selected plan.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Use whichever ID field is available
+      const userId = user?.id || user?._id;
+
+      const response = await createSubscriptionPayment({
+        userId: userId!,
+        plan: planName,
+        price: price,
+        currency: 'IDR'
+      }).unwrap();
+
+      const { token } = response;
+
+      // Load Midtrans SNAP script dynamically
+      const script = document.createElement('script');
+      // Use VITE environment variables (Vite uses VITE_ prefix)
+      script.src = import.meta.env.VITE_MIDTRANS_IS_PRODUCTION === 'true'
+        ? 'https://app.midtrans.com/snap/snap.js'
+        : 'https://app.sandbox.midtrans.com/snap/snap.js';
+      script.setAttribute('data-client-key', import.meta.env.VITE_MIDTRANS_CLIENT_KEY || '');
+
+      script.onload = () => {
+        // @ts-ignore
+        window.snap.pay(token, {
+          onSuccess: function(result: any) {
+            console.log('Payment success:', result);
+            alert('Payment successful!');
+            setIsLoading(false);
+          },
+          onPending: function(result: any) {
+            console.log('Payment pending:', result);
+            alert('Payment pending, please complete the transaction');
+            setIsLoading(false);
+          },
+          onError: function(result: any) {
+            console.log('Payment error:', result);
+            alert('Payment failed, please try again');
+            setIsLoading(false);
+          },
+          onClose: function() {
+            console.log('Customer closed the popup');
+            setIsLoading(false);
+          }
+        });
+      };
+
+      document.body.appendChild(script);
+
+    } catch (err) {
+      console.error('Payment error:', err);
+      setError('Failed to initiate payment. Please try again.');
+      setIsLoading(false);
+    }
+  };
 
   return (
     <PageLayout>
@@ -171,7 +272,7 @@ function BillingPage() {
                 <CardDescription>
                   <span className="text-3xl font-bold">
                     {isYearly
-                      ? `Rp${(plan.price * 12).toLocaleString("id-ID")}`
+                      ? `Rp${(plan.yearlyPrice || plan.price * 12).toLocaleString("id-ID")}`
                       : `Rp${plan.price.toLocaleString("id-ID")}`}
                   </span>
                   <span className="text-muted-foreground">
@@ -205,19 +306,42 @@ function BillingPage() {
               <CardFooter>
                 <Button
                   className="w-full"
-                  disabled={plan.isCurrent}
+                  disabled={plan.isCurrent || isLoading || (plan.name === "Pro" && (!user?._id && !user?.id))}
                   variant={plan.isMostPopular ? "default" : "outline"}
+                  onClick={plan.name === "Pro" ? () => handlePayment(plan) : undefined}
                 >
-                  {plan.isCurrent
-                    ? "Paket Saat Ini"
-                    : plan.name === "Gratis"
-                    ? "Downgrade"
-                    : "Upgrade ke Pro"}
+                  {isLoading ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      {plan.isCurrent
+                        ? "Paket Saat Ini"
+                        : plan.name === "Gratis"
+                        ? "Downgrade"
+                        : "Upgrade ke Pro"}
+                    </>
+                  )}
                 </Button>
               </CardFooter>
             </Card>
           ))}
         </div>
+
+        {error && (
+          <div className="mt-6 text-center">
+            <p className="text-destructive">{error}</p>
+          </div>
+        )}
+
+        {/* Show a message if user is not authenticated */}
+        {!user?.id && !user?._id && plans.some(p => p.name === "Pro") && (
+          <div className="mt-4 p-4 text-center bg-yellow-50 border border-yellow-200 rounded-md">
+            <p className="text-yellow-800">Silakan login terlebih dahulu untuk mengupgrade ke paket Pro</p>
+          </div>
+        )}
       </div>
     </PageLayout>
   );
