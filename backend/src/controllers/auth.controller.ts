@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { HTTPSTATUS } from "../config/http.config";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { googleLoginSchema, loginSchema, registerSchema } from "../validators/auth.validator";
-import { githubLoginService, googleLoginService, loginService, registerService } from "../services/auth.service";
-import { BadRequestException } from "../utils/app-error";
+import { githubLoginService, googleLoginService, loginService, registerService, refreshTokenService, logoutService } from "../services/auth.service";
+import { BadRequestException, UnauthorizedException } from "../utils/app-error";
 import { forgotPasswordSchema, resetPasswordSchema, verifyResetTokenSchema } from "../validators/auth.validator";
 import { forgotPasswordService, resetPasswordService, verifyResetTokenService} from "../services/auth.service";
 
@@ -93,6 +93,37 @@ export const resetPasswordController = asyncHandler(
   async (req: Request, res: Response) => {
     const { token, password } = resetPasswordSchema.parse(req.body);
     const result = await resetPasswordService(token, password);
+    return res.status(HTTPSTATUS.OK).json(result);
+  }
+);
+
+export const refreshController = asyncHandler(
+  async (req: Request, res: Response) => {
+    // The user ID should be available from the JWT middleware
+    const userId = (req as any).user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException("User ID not found in token");
+    }
+
+    const result = await refreshTokenService(userId);
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Token refreshed successfully",
+      user: result.user,
+      accessToken: result.accessToken,
+      expiresAt: result.expiresAt,
+      reportSetting: result.reportSetting,
+    });
+  }
+);
+
+export const logoutController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = (req as any).user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException("User ID not found in token");
+    }
+
+    const result = await logoutService(userId);
     return res.status(HTTPSTATUS.OK).json(result);
   }
 );
