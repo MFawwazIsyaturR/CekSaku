@@ -11,9 +11,9 @@ const BillingPage = () => {
   const { user } = useTypedSelector((state) => state.auth);
 
   // In a real application, you would fetch the user's subscription status from the backend
-  const subscriptionStatus = user?.subscriptionStatus || 'free';
-  const subscriptionPlan = user?.subscriptionPlan || 'Free Plan';
-  const subscriptionExpiredAt = user?.subscriptionExpiredAt || null;
+  const subscriptionStatus = user?.subscriptionStatus ?? 'free';
+  const subscriptionPlan = user?.subscriptionPlan ?? 'Free Plan';
+  const subscriptionExpiredAt = user?.subscriptionExpiredAt ?? null;
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -61,7 +61,12 @@ const BillingPage = () => {
                     <h3 className="font-semibold">{subscriptionPlan}</h3>
                     {subscriptionExpiredAt && (
                       <p className="text-sm text-muted-foreground">
-                        Expires: {new Date(subscriptionExpiredAt).toLocaleDateString()}
+                        Expires: {typeof subscriptionExpiredAt === 'string' 
+                          ? new Date(subscriptionExpiredAt).toLocaleDateString() 
+                          : (subscriptionExpiredAt instanceof Date 
+                            ? subscriptionExpiredAt.toLocaleDateString() 
+                            : '')
+                        }
                       </p>
                     )}
                   </div>

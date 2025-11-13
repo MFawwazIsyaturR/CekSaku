@@ -5,7 +5,7 @@ import TransactionModel, {
   TransactionTypeEnum,
 } from "../models/transaction.model";
 import { NotFoundException } from "../utils/app-error";
-import { calulateNextReportDate } from "../utils/helper";
+import { calculateNextReportDate } from "../utils/helper";
 import { UpdateReportSettingType } from "../validators/report.validator";
 import { convertToDollarUnit } from "../utils/format-currency";
 import { format } from "date-fns";
@@ -65,7 +65,7 @@ export const updateReportSettingService = async (
     const now = new Date();
     if (!currentNextReportDate || currentNextReportDate <= now) {
       // PERBAIKAN UTAMA: Kirim 'newFrequency' sebagai parameter pertama
-      nextReportDate = calulateNextReportDate(
+      nextReportDate = calculateNextReportDate(
         newFrequency,
         existingReportSetting.lastSentDate
       );

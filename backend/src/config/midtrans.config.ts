@@ -1,7 +1,7 @@
 import midtransClient from "midtrans-client";
 import { Env } from "./env.config";
 
-export let midtransClientInstance: midtransClient.CoreApi;
+export let midtransClientInstance: any;
 
 export const initializeMidtrans = () => {
   midtransClientInstance = new midtransClient.CoreApi({

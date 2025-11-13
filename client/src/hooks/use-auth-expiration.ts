@@ -32,13 +32,19 @@ const useAuthExpiration = () => {
         const currentTime = Date.now();
         const timeUntilExpiration = expiresAt - currentTime;
       if (timeUntilExpiration <= 0) {
-        // Token is already expired
-        handleTokenRefresh()
+        // Token is already expired, try to refresh it
+        handleTokenRefresh();
       } else {
+        // Set a timeout to refresh the token before it expires (1 minute before)
+        const refreshTimer = setTimeout(handleTokenRefresh, timeUntilExpiration - 60000);
         // Set a timeout to log out the user when the token expires
-        const timer = setTimeout(handleLogout, timeUntilExpiration);
-        // Cleanup the timer on component unmount or token change
-        return () => clearTimeout(timer);
+        const logoutTimer = setTimeout(handleLogout, timeUntilExpiration);
+        
+        // Cleanup the timers on component unmount or token change
+        return () => {
+          clearTimeout(refreshTimer);
+          clearTimeout(logoutTimer);
+        };
       }
     }
   }, [accessToken, dispatch, expiresAt, refreshToken]);

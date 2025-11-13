@@ -21,7 +21,7 @@ export const createSubscriptionPaymentController = asyncHandler(
         first_name: req.user?.name?.split(' ')[0] || '',
         last_name: req.user?.name?.split(' ')[1] || '',
         email: req.user?.email || '',
-        phone: req.user?.phone || '',
+        phone: '',
       }
     });
 

@@ -8,10 +8,14 @@ interface AuthState {
 }
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   profilePicture: string;
+  subscriptionStatus?: 'active' | 'cancelled' | 'pending' | 'expired';
+  subscriptionPlan?: string;
+  subscriptionOrderId?: string;
+  subscriptionExpiredAt?: string | Date | null;
 }
 
 interface ReportSetting {
