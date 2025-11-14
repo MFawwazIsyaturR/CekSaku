@@ -14,6 +14,7 @@ export const paymentApi = apiClient.injectEndpoints({
         method: 'POST',
         body,
       }),
+      transformResponse: (response: { data: PaymentResponse }) => response.data,
       invalidatesTags: ['billingSubscription'],
     }),
   }),

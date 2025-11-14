@@ -4,7 +4,7 @@ import { Env } from "./env.config";
 export let midtransClientInstance: any;
 
 export const initializeMidtrans = () => {
-  midtransClientInstance = new midtransClient.CoreApi({
+ midtransClientInstance = new midtransClient.Snap({
     isProduction: Env.MIDTRANS_IS_PRODUCTION === "true",
     serverKey: Env.MIDTRANS_SERVER_KEY,
     clientKey: Env.MIDTRANS_CLIENT_KEY,

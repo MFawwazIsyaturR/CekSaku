@@ -1,3 +1,4 @@
+import { Env } from "../config/env.config";
 import { midtransClientInstance } from "../config/midtrans.config";
 import { BadRequestException } from "../utils/app-error";
 import { UpdateUserParams, updateUser } from "./user.service";
@@ -33,7 +34,7 @@ export const createSubscriptionPayment = async (params: CreatePaymentParams) => 
 
   // Create transaction details for Midtrans
   const transactionDetails = {
-    transaction_id: orderId,
+    // transaction_id: orderId,
     order_id: orderId,
     gross_amount: price,
   };
@@ -61,19 +62,24 @@ export const createSubscriptionPayment = async (params: CreatePaymentParams) => 
         merchant_name: "CekSaku",
       },
     ],
+    callbacks: {
+      finish: `${Env.FRONTEND_ORIGIN}/overview`,
+      error: `${Env.FRONTEND_ORIGIN}/billing`,
+      pending: `${Env.FRONTEND_ORIGIN}/billing`
+    }
   };
 
   try {
     // Create the transaction using Midtrans
-    const transaction = await midtransClientInstance.charge(paymentPayload);
+    const transaction = await midtransClientInstance.createTransaction(paymentPayload);
     
     return {
-      orderId: transaction.order_id,
-      transactionId: transaction.transaction_id,
-      transactionStatus: transaction.transaction_status,
-      paymentUrl: transaction.redirect_url,
-      token: transaction.token_id,
-      grossAmount: transaction.gross_amount,
+      orderId: orderId,
+      transactionId: orderId, // Kita bisa gunakan orderId sebagai referensi awal
+      transactionStatus: 'pending', // Transaksi Snap selalu 'pending' saat dibuat
+      paymentUrl: transaction.redirect_url || '', // URL jika Snap tidak bisa di-load
+      token: transaction.token, // Ini adalah Snap Token yang dibutuhkan frontend
+      grossAmount: price.toString(),
     };
   } catch (error: any) {
     console.error("Midtrans payment creation error:", error);
@@ -81,7 +87,8 @@ export const createSubscriptionPayment = async (params: CreatePaymentParams) => 
     if (error.api_response) {
       console.error("Midtrans API response:", error.api_response);
     }
-    throw new BadRequestException("Failed to create payment transaction: " + error.message);
+    // Provide a more specific error message to the frontend
+    throw new BadRequestException("Failed to create payment transaction. Please check your Midtrans configuration: " + error.message);
   }
 };
 
