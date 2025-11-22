@@ -17,5 +17,6 @@ export const isAuthRoute = (pathname: string): boolean => {
     SETTINGS: "/settings",
     SETTINGS_APPEARANCE: "/settings/appearance",
     SETTINGS_BILLING: "/settings/billing",
-     SETTINGS_SECURITY: "/settings/security",
+    SETTINGS_SECURITY: "/settings/security",
+    SETTINGS_PAYMENT: "/settings/pembayaran",
   };

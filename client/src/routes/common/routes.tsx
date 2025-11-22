@@ -15,6 +15,7 @@ import GoogleCallback from "@/pages/auth/GoogleCallback";
 import TermsAndConditions from "@/pages/landing/TermsAndConditions";
 import ContactPage from "@/pages/landing/ContactPage";
 import BillingPage from "@/pages/billing";
+import Payment from "@/pages/settings/payment";
 
 export const authenticationRoutePaths = [
   { path: AUTH_ROUTES.LANDING, element: <LandingPage /> },
@@ -40,6 +41,7 @@ export const protectedRoutePaths = [
       { path: PROTECTED_ROUTES.SETTINGS, element: <Account /> },
       { path: PROTECTED_ROUTES.SETTINGS_APPEARANCE, element: <Appearance /> },
       { path: PROTECTED_ROUTES.SETTINGS_SECURITY, element: <Security /> },
+      { path: PROTECTED_ROUTES.SETTINGS_PAYMENT, element: <Payment /> },
     ],
   },
 ];

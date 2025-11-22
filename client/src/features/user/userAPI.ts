@@ -25,7 +25,14 @@ export const userApi = apiClient.injectEndpoints({
         body,
       }),
     }),
+    getUserProfile: builder.query<User, void>({
+      query: () => ({
+        url: "/user/profile",
+        method: "GET",
+      }),
+      providesTags: ['UserProfile'],
+    }),
   }),
 });
 
-export const { useUpdateUserMutation, useDeleteUserMutation, useChangePasswordMutation } = userApi;
+export const { useUpdateUserMutation, useDeleteUserMutation, useChangePasswordMutation, useGetUserProfileQuery } = userApi;

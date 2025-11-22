@@ -11,8 +11,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Check, X } from "lucide-react";
 import React, { useState } from "react";
-import { useTypedSelector } from "@/app/hook";
+import { useAppDispatch, useTypedSelector } from "@/app/hook";
 import { useCreateSubscriptionPaymentMutation } from "@/features/payment/paymentAPI";
+import { updateCredentials } from "@/features/auth/authSlice";
 
 /* =========================================================
    ============= PENGGANTI UNTUK KOMPONEN LAYOUT ==========
@@ -84,7 +85,7 @@ const plans: Plan[] = [
     price: 0,
     features: features.slice(0, 4),
     isMostPopular: false,
-    isCurrent: true,
+    isCurrent: false, // This will be determined dynamically
   },
   {
     name: "Pro",
@@ -93,7 +94,7 @@ const plans: Plan[] = [
     yearlyPrice: 19999 * 12, // Yearly price without discount
     features: features,
     isMostPopular: true,
-    isCurrent: false,
+    isCurrent: false, // This will be determined dynamically
   },
 ];
 
@@ -132,6 +133,7 @@ function BillingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const dispatch = useAppDispatch();
   const { user } = useTypedSelector((state) => state.auth);
 
   const [createSubscriptionPayment, { isLoading: isCreatingPayment }] = useCreateSubscriptionPaymentMutation();
@@ -145,7 +147,7 @@ function BillingPage() {
 
     try {
       // Double-check that user exists, in case the UI state wasn't accurate
-      if (!user?.id && !user?._id) {
+      if (!user?.id) {
         setError('User not authenticated. Please log in first.');
         setIsLoading(false);
         return;
@@ -165,8 +167,8 @@ function BillingPage() {
         return;
       }
 
-      // Use whichever ID field is available
-      const userId = user?.id || user?._id;
+      // Use user ID
+      const userId = user?.id;
 
       const response = await createSubscriptionPayment({
         userId: userId!,
@@ -191,6 +193,17 @@ function BillingPage() {
           onSuccess: function(result: any) {
             console.log('Payment success:', result);
             alert('Payment successful!');
+            // Update the user's subscription status in the store
+            if (user) {
+              dispatch(updateCredentials({
+                user: {
+                  ...user,
+                  subscriptionStatus: 'active',
+                  subscriptionPlan: 'Pro',
+                  subscriptionOrderId: result.order_id || null,
+                }
+              }));
+            }
             setIsLoading(false);
           },
           onPending: function(result: any) {
@@ -217,6 +230,12 @@ function BillingPage() {
       setError('Failed to initiate payment. Please try again.');
       setIsLoading(false);
     }
+  };
+
+  const handleDowngrade = () => {
+    // In this implementation, the free tier is automatic
+    // In a real-world scenario, you might want to have actual downgrade functionality
+    alert("You are already on the free plan.");
   };
 
   return (
@@ -254,7 +273,13 @@ function BillingPage() {
 
         {/* ==================== GRID PLAN ==================== */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          {plans.map((plan) => (
+          {plans.map((plan) => {
+            // Determine if this plan is the user's current plan based on subscription status
+            const isCurrentProPlan = user && user.subscriptionStatus === 'active' && plan.name === 'Pro';
+            const isCurrentFreePlan = (!user || !user.subscriptionStatus || user.subscriptionStatus === 'pending' || user.subscriptionStatus === 'cancelled' || user.subscriptionStatus === 'expired') && plan.name === 'Gratis';
+            const isCurrentPlan = isCurrentProPlan || isCurrentFreePlan;
+
+            return (
             <Card
               key={plan.name}
               className={cn("flex flex-col", {
@@ -306,9 +331,10 @@ function BillingPage() {
               <CardFooter>
                 <Button
                   className="w-full"
-                  disabled={plan.isCurrent || isLoading || (plan.name === "Pro" && (!user?._id && !user?.id))}
+                  disabled={isCurrentPlan || isLoading || (plan.name === "Pro" && !user?.id)}
                   variant={plan.isMostPopular ? "default" : "outline"}
-                  onClick={plan.name === "Pro" ? () => handlePayment(plan) : undefined}
+                  onClick={plan.name === "Pro" ? () => handlePayment(plan) : 
+                           plan.name === "Gratis" ? () => handleDowngrade() : undefined}
                 >
                   {isLoading ? (
                     <>
@@ -317,7 +343,7 @@ function BillingPage() {
                     </>
                   ) : (
                     <>
-                      {plan.isCurrent
+                      {isCurrentPlan
                         ? "Paket Saat Ini"
                         : plan.name === "Gratis"
                         ? "Downgrade"
@@ -327,7 +353,7 @@ function BillingPage() {
                 </Button>
               </CardFooter>
             </Card>
-          ))}
+          )})}
         </div>
 
         {error && (
@@ -337,7 +363,7 @@ function BillingPage() {
         )}
 
         {/* Show a message if user is not authenticated */}
-        {!user?.id && !user?._id && plans.some(p => p.name === "Pro") && (
+        {!user?.id && plans.some(p => p.name === "Pro") && (
           <div className="mt-4 p-4 text-center bg-yellow-50 border border-yellow-200 rounded-md">
             <p className="text-yellow-800">Silakan login terlebih dahulu untuk mengupgrade ke paket Pro</p>
           </div>

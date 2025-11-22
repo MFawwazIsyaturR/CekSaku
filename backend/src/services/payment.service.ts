@@ -72,7 +72,7 @@ export const createSubscriptionPayment = async (params: CreatePaymentParams) => 
   try {
     // Create the transaction using Midtrans
     const transaction = await midtransClientInstance.createTransaction(paymentPayload);
-    
+
     return {
       orderId: orderId,
       transactionId: orderId, // Kita bisa gunakan orderId sebagai referensi awal
@@ -92,11 +92,58 @@ export const createSubscriptionPayment = async (params: CreatePaymentParams) => 
   }
 };
 
+export const cancelSubscription = async (orderId: string) => {
+  try {
+    // First, check the current status of the transaction from Midtrans
+    const transactionStatus = await midtransClientInstance.transaction.status(orderId);
+    
+    console.log("Current transaction status from Midtrans:", transactionStatus);
+
+    // If the transaction is still pending or active, we can cancel it through Midtrans
+    if (transactionStatus.transaction_status === 'pending' || 
+        transactionStatus.transaction_status === 'settlement' || 
+        transactionStatus.transaction_status === 'capture') {
+      
+      // Cancel the transaction in Midtrans
+      const cancelResult = await midtransClientInstance.transaction.cancel(orderId);
+      console.log("Transaction cancelled in Midtrans:", cancelResult);
+    }
+
+    // Update user subscription status to cancelled
+    await updateUserSubscription(orderId, 'cancelled', transactionStatus);
+
+    return {
+      message: `Subscription with order ID ${orderId} has been cancelled`,
+      cancelledOrderId: orderId
+    };
+  } catch (error: any) {
+    console.error("Error cancelling subscription:", error);
+    // Check if this is a Midtrans-specific error
+    if (error.message && error.message.includes('not found')) {
+      // If the transaction doesn't exist in Midtrans, still update user status
+      console.log(`Transaction ${orderId} not found in Midtrans, updating user status directly`);
+      
+      // We still want to update the user's subscription status even if Midtrans doesn't have the transaction
+      await updateUserSubscription(orderId, 'cancelled', { 
+        item_details: [{ name: 'Subscription' }], 
+        transaction_status: 'cancel' 
+      });
+
+      return {
+        message: `Subscription with order ID ${orderId} has been cancelled (not found in Midtrans)`,
+        cancelledOrderId: orderId
+      };
+    }
+    
+    throw new BadRequestException(`Failed to cancel subscription: ${error.message}`);
+  }
+};
+
 export const handlePaymentNotification = async (payload: PaymentNotificationPayload) => {
   try {
     // Get the latest status of the transaction from Midtrans
     const transactionStatus = await midtransClientInstance.transaction.status(payload.order_id);
-    
+
     console.log("Transaction status from Midtrans:", transactionStatus);
 
     // Process based on transaction status
@@ -106,7 +153,7 @@ export const handlePaymentNotification = async (payload: PaymentNotificationPayl
         // Payment successful - update user subscription
         await updateUserSubscription(payload.order_id, 'active', transactionStatus);
         break;
-      
+
       case 'cancel':
       case 'expire':
         // Payment failed or expired
@@ -129,14 +176,14 @@ export const handlePaymentNotification = async (payload: PaymentNotificationPayl
 };
 
 const updateUserSubscription = async (
-  orderId: string, 
+  orderId: string,
   status: 'active' | 'cancelled' | 'pending',
   transactionData: any
 ) => {
   try {
     // Extract userId from order ID (SUB-userId-timestamp format)
     const userId = orderId.split('-')[1];
-    
+
     if (!userId) {
       throw new Error(`Invalid order ID format: ${orderId}`);
     }
@@ -147,13 +194,13 @@ const updateUserSubscription = async (
       subscriptionStatus: status,
       subscriptionPlan: transactionData.item_details?.[0]?.name || 'Basic',
       subscriptionOrderId: orderId,
-      subscriptionExpiredAt: status === 'active' 
+      subscriptionExpiredAt: status === 'active'
         ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
         : undefined,
     };
 
     await updateUser(userId, updateData);
-    
+
     console.log(`User ${userId} subscription updated to ${status} for order ${orderId}`);
   } catch (error) {
     console.error("Error updating user subscription:", error);

@@ -16,6 +16,7 @@ const Settings = () => {
       { title: "Akun", href: PROTECTED_ROUTES.SETTINGS },
       { title: "Tampilan", href: PROTECTED_ROUTES.SETTINGS_APPEARANCE },
       { title: "Keamanan", href: PROTECTED_ROUTES.SETTINGS_SECURITY },
+      { title: "Pembayaran", href: PROTECTED_ROUTES.SETTINGS_PAYMENT },
       // Hapus atau beri komentar jika Billing tidak digunakan/belum siap
       // { title: "Tagihan", href: PROTECTED_ROUTES.SETTINGS_BILLING },
     ];

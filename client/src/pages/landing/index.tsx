@@ -11,7 +11,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ArrowDown, BarChart, FileText, Import, ScanLine } from "lucide-react";
 import "./landing.css";
 import React from "react";
-import mockupImg from "@/assets/images/mockup-ceksaku.png";
+import mockupImg from "@/assets/images/mockup-ceksaku.webp";
 import { Plus, Minus } from "lucide-react";
 import PricingSection from "./PricingSection";
 

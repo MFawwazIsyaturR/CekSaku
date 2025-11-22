@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { HTTPSTATUS } from "../config/http.config";
-import { createSubscriptionPayment, handlePaymentNotification } from "../services/payment.service";
+import { createSubscriptionPayment, handlePaymentNotification, cancelSubscription } from "../services/payment.service";
 import { BadRequestException, InternalServerErrorException } from "../utils/app-error";
 
 export const createSubscriptionPaymentController = asyncHandler(
@@ -32,11 +32,27 @@ export const createSubscriptionPaymentController = asyncHandler(
   }
 );
 
+export const cancelSubscriptionController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { orderId } = req.body;
+
+    if (!orderId) {
+      throw new BadRequestException("Order ID is required");
+    }
+
+    await cancelSubscription(orderId);
+
+    res.status(HTTPSTATUS.OK).json({
+      message: "Subscription cancelled successfully",
+    });
+  }
+);
+
 export const handlePaymentNotificationController = asyncHandler(
   async (req: Request, res: Response) => {
     try {
       await handlePaymentNotification(req.body);
-      
+
       res.status(HTTPSTATUS.OK).json({
         message: "Notification handled successfully",
       });

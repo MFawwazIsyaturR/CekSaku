@@ -17,7 +17,30 @@ export const paymentApi = apiClient.injectEndpoints({
       transformResponse: (response: { data: PaymentResponse }) => response.data,
       invalidatesTags: ['billingSubscription'],
     }),
+
+    cancelSubscription: builder.mutation<{message: string}, {
+      orderId: string;
+    }>({
+      query: (body) => ({
+        url: `/payment/cancel-subscription`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['billingSubscription'],
+    }),
+    
+    cancelSubscription: builder.mutation<{message: string}, {
+      orderId: string;
+    }>({
+      query: (body) => ({
+        url: `/payment/cancel-subscription`,
+        method: 'PUT',
+        body,
+      }),
+      transformResponse: (response: { message: string }) => response,
+      invalidatesTags: ['billingSubscription'],
+    }),
   }),
 });
 
-export const { useCreateSubscriptionPaymentMutation } = paymentApi;
+export const { useCreateSubscriptionPaymentMutation, useCancelSubscriptionMutation } = paymentApi;
