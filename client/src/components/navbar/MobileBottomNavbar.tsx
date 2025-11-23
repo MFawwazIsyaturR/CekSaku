@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LogoutDialog from "./logout-dialog";
+import { useTheme } from "@/context/theme-provider";
 
 // 1. Definisikan item navigasi utama (dari Sidebar desktop Anda)
 const navItems = [
@@ -25,6 +26,7 @@ const navItems = [
 const MobileBottomNavbar = () => {
   const location = useLocation();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const { theme } = useTheme();
 
   // Fungsi untuk mengecek apakah link aktif (termasuk sub-route)
   const isActive = (href: string) => {
@@ -49,12 +51,13 @@ const MobileBottomNavbar = () => {
       <div className="fixed bottom-0 left-0 right-0 h-24 z-50 md:hidden pointer-events-none flex justify-center">
         
         {/* Navigasi mengambang */}
-        <nav className="absolute bottom-4 w-[95vw] max-w-sm
-                        bg-gray-900 dark:bg-gray-900 
-                        border border-gray-700
-                        rounded-2xl shadow-lg p-2
-                        flex items-stretch justify-around rounded-full
-                        pointer-events-auto h-20">
+        <nav className={cn(
+          "absolute bottom-4 w-[95vw] max-w-sm",
+          theme === "light"
+            ? "bg-white border-gray-200"
+            : "bg-gray-900 border-gray-700",
+          "border rounded-2xl shadow-lg p-2 flex items-stretch justify-around rounded-full pointer-events-auto h-20"
+        )}>
           
           {/* 1. Render 4 item navigasi utama */}
           {navItems.map((item) => (
@@ -64,16 +67,18 @@ const MobileBottomNavbar = () => {
               className={cn(
                 "relative flex flex-col items-center justify-center gap-1 w-1/5 rounded-lg py-2 transition-all",
                 isActive(item.href)
-                  ? "text-blue-400" // Warna aktif
-                  : "text-gray-400 hover:text-gray-200" // Warna non-aktif
+                  ? "text-blue-500" // Warna aktif
+                  : theme === "light"
+                    ? "text-gray-600 hover:text-gray-900" // Warna non-aktif untuk light mode
+                    : "text-gray-400 hover:text-gray-200" // Warna non-aktif untuk dark mode
               )}
             >
               {/* Indikator aktif (pill biru di atas) */}
               <div className={cn(
                 "absolute -bottom-2 h-2 w-10 rounded-full transition-all",
-                isActive(item.href) ? "bg-blue-400" : "bg-transparent"
+                isActive(item.href) ? "bg-blue-500" : "bg-transparent"
               )}></div>
-              
+
               <item.icon className="h-5 w-5" />
               <span className="text-xs font-medium">{item.label}</span>
             </NavLink>
