@@ -24,10 +24,6 @@ import {
 } from "@/components/ui/accordion"; // Mengimpor komponen Accordion
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAppDispatch } from "@/app/hook";
-import { logout } from "@/features/auth/authSlice";
-import { AUTH_ROUTES } from "@/routes/common/routePath";
-import { useNavigate } from "react-router-dom";
 import LogoutDialog from "../navbar/logout-dialog";
 
 /**
@@ -292,9 +288,9 @@ const LogoutButton = ({ isSidebarOpen, onClick }: { isSidebarOpen: boolean; onCl
       onClick={onClick}
       variant="ghost"
       className={cn(
-        "flex items-center w-full text-red-400 hover:text-white rounded-lg px-3 py-3 transition-all",
+        " mt-60 items-center w-full text-red-400 hover:text-white rounded-lg px-3 py-3 transition-all",
         !isSidebarOpen ? "justify-center" : "gap-3",
-        "bg-pink-500 hover:bg-red-500 text-white"
+        "bg-red-400 hover:bg-red-500 text-white"
       )}
     >
       <LogOut className={cn(isSidebarOpen ? "h-5 w-5" : "h-5 w-5")} />
