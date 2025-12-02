@@ -22,12 +22,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"; // Mengimpor komponen Accordion
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch } from "@/app/hook";
 import { logout } from "@/features/auth/authSlice";
 import { AUTH_ROUTES } from "@/routes/common/routePath";
 import { useNavigate } from "react-router-dom";
+import LogoutDialog from "../navbar/logout-dialog";
 
 /**
  * Props untuk komponen Sidebar.
@@ -73,6 +74,7 @@ const bottomNavItems = [
  * serta dapat bertransisi antara mode terbuka dan tertutup.
  */
 function Sidebar({ isSidebarOpen }: SidebarProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const location = useLocation();
 
   // Fungsi pembantu untuk mengecek apakah path saat ini cocok (termasuk sub-rute)
@@ -272,31 +274,27 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
           ))}
 
           {/* Logout Button */}
-          <LogoutButton isSidebarOpen={isSidebarOpen} />
+          <LogoutButton
+            isSidebarOpen={isSidebarOpen}
+            onClick={() => setIsDialogOpen(true)}
+          />
         </nav>
       </div>
+      <LogoutDialog isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} />
     </div>
   );
 }
 
 // Logout Button Component
-const LogoutButton = ({ isSidebarOpen }: { isSidebarOpen: boolean }) => {
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate(AUTH_ROUTES.LANDING);
-  };
-
+const LogoutButton = ({ isSidebarOpen, onClick }: { isSidebarOpen: boolean; onClick: () => void }) => {
   return (
     <Button
-      onClick={handleLogout}
+      onClick={onClick}
       variant="ghost"
       className={cn(
         "flex items-center w-full text-red-400 hover:text-white rounded-lg px-3 py-3 transition-all",
         !isSidebarOpen ? "justify-center" : "gap-3",
-        "bg-red-400 hover:bg-red-500 text-white" 
+        "bg-pink-500 hover:bg-red-500 text-white"
       )}
     >
       <LogOut className={cn(isSidebarOpen ? "h-5 w-5" : "h-5 w-5")} />
