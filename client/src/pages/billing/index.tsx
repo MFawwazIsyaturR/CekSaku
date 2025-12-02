@@ -365,7 +365,7 @@ function BillingPage() {
         {/* Show a message if user is not authenticated */}
         {!user?.id && plans.some(p => p.name === "Pro") && (
           <div className="mt-4 p-4 text-center bg-yellow-50 border border-yellow-200 rounded-md">
-            <p className="text-yellow-800">Silakan login terlebih dahulu untuk mengupgrade ke paket Pro</p>
+            <p className="text-yellow-800">Fitur baru akan segera hadir! Saat ini, semua paket kami tersedia secara gratis</p>
           </div>
         )}
       </div>

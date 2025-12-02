@@ -12,6 +12,7 @@ import {
   BarChart, // Ikon untuk "Analitik"
   Briefcase, // Ikon untuk "Aset & Investasi"
   CreditCard, // Ikon untuk "Penagihan"
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "../logo/logo";
@@ -22,6 +23,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"; // Mengimpor komponen Accordion
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { useAppDispatch } from "@/app/hook";
+import { logout } from "@/features/auth/authSlice";
+import { AUTH_ROUTES } from "@/routes/common/routePath";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Props untuk komponen Sidebar.
@@ -84,19 +90,18 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
     return activeCategories;
   }, [location.pathname]);
 
-  // ===================================================================
-  // ========= PERUBAHAN UTAMA ADA DI DALAM KOMPONEN NAVLINK INI =========
-  // ===================================================================
   const NavLink = ({
     href,
     icon: Icon,
     label,
     isChild = false,
+    className: additionalClassName = "",
   }: {
     href: string;
     icon: React.ElementType;
     label: string;
     isChild?: boolean;
+    className?: string;
   }) => (
     <Link
       to={href}
@@ -117,7 +122,10 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
         // Logika untuk alignment & gap
         !isSidebarOpen
           ? "justify-center" // Saat tertutup: HANYA justify-center.
-          : "gap-3" // Saat terbuka: BARU tambahkan 'gap-3'.
+          : "gap-3", // Saat terbuka: BARU tambahkan 'gap-3'.
+
+        // Tambahkan className tambahan jika ada
+        additionalClassName
       )}
     >
       {/* [PERUBAHAN 2] Ukuran ikon dibuat kondisional
@@ -139,9 +147,6 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
       </span>
     </Link>
   );
-  // ===================================================================
-  // =================== AKHIR DARI PERUBAHAN UTAMA ====================
-  // ===================================================================
 
   return (
     <div className="flex h-full max-h-screen flex-col gap-2">
@@ -210,7 +215,12 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
               {/* Tambah 'pt-1' dan 'space-y-1' untuk jarak antar item di dalam accordion */}
               <AccordionContent className="pb-0 pt-1 space-y-1">
                 {planningItems.map((item) => (
-                  <NavLink key={item.href} {...item} isChild />
+                  <NavLink
+                    key={item.href}
+                    {...item}
+                    isChild
+                    className="scale-105" // Slightly enlarge content in dropdown
+                  />
                 ))}
               </AccordionContent>
             </AccordionItem>
@@ -245,7 +255,12 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
               {/* Tambah 'pt-1' dan 'space-y-1' untuk jarak antar item di dalam accordion */}
               <AccordionContent className="pb-0 pt-1 space-y-1">
                 {analysisItems.map((item) => (
-                  <NavLink key={item.href} {...item} isChild />
+                  <NavLink
+                    key={item.href}
+                    {...item}
+                    isChild
+                    className="scale-105" // Slightly enlarge content in dropdown
+                  />
                 ))}
               </AccordionContent>
             </AccordionItem>
@@ -255,10 +270,39 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
           {bottomNavItems.map((item) => (
             <NavLink key={item.href} {...item} />
           ))}
+
+          {/* Logout Button */}
+          <LogoutButton isSidebarOpen={isSidebarOpen} />
         </nav>
       </div>
     </div>
   );
 }
+
+// Logout Button Component
+const LogoutButton = ({ isSidebarOpen }: { isSidebarOpen: boolean }) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate(AUTH_ROUTES.LANDING);
+  };
+
+  return (
+    <Button
+      onClick={handleLogout}
+      variant="ghost"
+      className={cn(
+        "flex items-center w-full text-red-400 hover:text-white rounded-lg px-3 py-3 transition-all",
+        !isSidebarOpen ? "justify-center" : "gap-3",
+        "bg-red-400 hover:bg-red-500 text-white" 
+      )}
+    >
+      <LogOut className={cn(isSidebarOpen ? "h-5 w-5" : "h-5 w-5")} />
+      {isSidebarOpen && <span className="whitespace-nowrap">Keluar</span>}
+    </Button>
+  );
+};
 
 export default Sidebar;

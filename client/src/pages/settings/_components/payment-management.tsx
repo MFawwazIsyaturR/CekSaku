@@ -103,7 +103,7 @@ export default function PaymentManagement() {
                 {user?.subscriptionExpiredAt ? new Date(user?.subscriptionExpiredAt).toLocaleDateString("id-ID") : "-"}
               </span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-2">
               <span className="text-sm font-medium">Jenis Pembayaran:</span>
               <span className="text-sm text-muted-foreground">Tahunan</span>
             </div>
