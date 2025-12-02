@@ -290,7 +290,7 @@ const LogoutButton = ({ isSidebarOpen, onClick }: { isSidebarOpen: boolean; onCl
       className={cn(
         " mt-60 items-center w-full text-red-400 hover:text-white rounded-lg px-3 py-3 transition-all",
         !isSidebarOpen ? "justify-center" : "gap-3",
-        "bg-red-400 hover:bg-red-500 text-white"
+        "bg-red-500 hover:bg-red-600 text-white"
       )}
     >
       <LogOut className={cn(isSidebarOpen ? "h-5 w-5" : "h-5 w-5")} />
