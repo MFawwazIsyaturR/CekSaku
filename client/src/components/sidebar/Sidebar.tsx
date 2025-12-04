@@ -150,7 +150,7 @@ const LogoutButton = ({ isSidebarOpen, onClick }: { isSidebarOpen: boolean; onCl
       onClick={onClick}
       variant="ghost"
       className={cn(
-        " mt-60 items-center w-full text-red-400 hover:text-white rounded-lg px-3 py-3 transition-all",
+        " mt-70 items-center w-full text-red-400 hover:text-white rounded-lg px-3 py-3 transition-all",
         !isSidebarOpen ? "justify-center" : "gap-3",
         "bg-red-500 hover:bg-red-600 text-white"
       )}
