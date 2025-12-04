@@ -19,7 +19,7 @@ interface SidebarProps {
 }
 
 const topLevelNavItems = [
-  { label: "Dashboard", href: "/overview", icon: LayoutGrid },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
   { label: "Transaksi", href: "/transactions", icon: ReceiptText },
   { label: "Laporan", href: "/reports", icon: TrendingUp },
 ];

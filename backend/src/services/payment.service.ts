@@ -63,7 +63,7 @@ export const createSubscriptionPayment = async (params: CreatePaymentParams) => 
       },
     ],
     callbacks: {
-      finish: `${Env.FRONTEND_ORIGIN}/overview`,
+      finish: `${Env.FRONTEND_ORIGIN}/dashboard`,
       error: `${Env.FRONTEND_ORIGIN}/billing`,
       pending: `${Env.FRONTEND_ORIGIN}/billing`
     }

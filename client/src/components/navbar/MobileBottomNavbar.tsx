@@ -27,7 +27,7 @@ import { AUTH_ROUTES } from "@/routes/common/routePath";
 import { Separator } from "@/components/ui/separator";
 
 const primaryNavItems = [
-  { label: "Dashboard", href: "/overview", icon: LayoutGrid },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
   { label: "Transaksi", href: "/transactions", icon: ReceiptText },
   { label: "Aset", href: "/assets", icon: Briefcase },
   { label: "Laporan", href: "/reports", icon: TrendingUp },

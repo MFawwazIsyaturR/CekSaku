@@ -53,14 +53,14 @@ const getCardStatus = (
   if (cardType === "savings") {
     if (value === 0) {
       return {
-        label: "No Savings Data",
+        label: "Tidak Ada Data Tabungan",
         color: "text-gray-400 dark:text-gray-500",
         Icon: TrendingDownIcon,
       };
     }
     if (value < 10) {
       return {
-        label: "Low Savings",
+        label: "Tabungan Rendah",
         color: "text-red-500 dark:text-red-400",
         Icon: TrendingDownIcon,
         description: `Only ${value.toFixed(1)}% saved`,
@@ -68,7 +68,7 @@ const getCardStatus = (
     }
     if (value < 20) {
       return {
-        label: "Fair Savings",
+        label: "Tabungan Cukup",
         color: "text-yellow-500 dark:text-yellow-400",
         Icon: TrendingUpIcon, // Can be neutral or up
         description: `${expenseRatio?.toFixed(0)}% spent`,
@@ -77,7 +77,7 @@ const getCardStatus = (
     // High savings checks
     if (expenseRatio && expenseRatio > 75) {
       return {
-        label: "High Expenses",
+        label: "Pengeluaran Tinggi",
         color: "text-red-500 dark:text-red-400",
         Icon: TrendingDownIcon,
         description: `${expenseRatio.toFixed(0)}% spent`,
@@ -85,14 +85,14 @@ const getCardStatus = (
     }
     if (expenseRatio && expenseRatio > 60) {
       return {
-        label: "Check Expenses",
+        label: "Cek Pengeluaran",
         color: "text-orange-500 dark:text-orange-400",
         Icon: TrendingDownIcon,
         description: `${expenseRatio.toFixed(0)}% spent`,
       };
     }
     return {
-      label: "Great Savings!",
+      label: "Tabungan yang Bagus!",
       color: "text-green-600 dark:text-green-400",
       Icon: TrendingUpIcon,
     };
