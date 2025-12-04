@@ -49,29 +49,24 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
       to={href}
       className={cn(
         "group flex items-center rounded-lg py-3 text-muted-foreground transition-all duration-300 hover:text-primary relative overflow-hidden",
-        // [LOGIKA POSISI]
-        // Open: px-3 (standar)
-        // Closed: px-[18px] (presisi tengah: (72px - 16px padding container - 20px icon) / 2 = 18px)
-        isSidebarOpen ? "px-3" : "px-[18px]",
+        "px-3", 
         isActive(href) && "bg-muted text-primary"
       )}
     >
-      {/* Ikon */}
       <Icon className={cn("h-5 w-5 shrink-0 transition-all duration-300")} />
 
-      {/* Teks dengan animasi Width & Opacity */}
       <span
         className={cn(
-          "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out",
+          "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ml-3",
           isSidebarOpen
-            ? "max-w-[200px] opacity-100 ml-3 translate-x-0"
-            : "max-w-0 opacity-0 -translate-x-5"
+            ? "max-w-[200px] opacity-100"
+            : "max-w-0 opacity-0"         
         )}
       >
         {label}
       </span>
 
-      {/* Tooltip sederhana saat sidebar tertutup */}
+      {/* Tooltip saat sidebar tertutup */}
       {!isSidebarOpen && (
         <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 border">
           {label}
@@ -86,15 +81,13 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
       <div
         className={cn(
           "flex h-14 items-center transition-all duration-300 lg:h-[60px]",
-          // Padding logo disamakan logikanya agar sejajar dengan menu
-          isSidebarOpen ? "px-6" : "px-[18px]"
+          "px-6"
         )}
       >
         <Logo showText={isSidebarOpen} color="foreground" />
       </div>
 
       {/* --- Menu Navigasi --- */}
-      {/* Class scrollbar-hide ditambahkan untuk menyembunyikan scrollbar native */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <nav className="grid items-start px-2 gap-y-1">
           {topLevelNavItems.map((item) => (
@@ -113,19 +106,20 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
           onClick={() => setIsDialogOpen(true)}
           variant="ghost"
           className={cn(
-            "w-full transition-all duration-300 group flex items-center relative overflow-hidden",
-            "text-red-500 hover:text-white hover:bg-red-500 dark:hover:bg-red-950/30",
-            isSidebarOpen ? "px-3 justify-start" : "px-[18px] justify-start"
+            "w-full justify-start transition-all duration-300 group flex items-center relative overflow-hidden",
+            "text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300",
+            "hover:bg-red-50 dark:hover:bg-red-950/30",
+            "px-3"
           )}
         >
           <LogOut className="h-5 w-5 shrink-0 transition-all duration-300" />
-
+          
           <span
             className={cn(
-              "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out",
-              isSidebarOpen
-                ? "max-w-[200px] opacity-100 ml-3 translate-x-0"
-                : "max-w-0 opacity-0 -translate-x-5"
+              "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ml-3",
+              isSidebarOpen 
+                ? "max-w-[200px] opacity-100" 
+                : "max-w-0 opacity-0"
             )}
           >
             Keluar
