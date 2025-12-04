@@ -4,8 +4,8 @@ import {
   LayoutGrid,
   TrendingUp,
   ReceiptText,
-  Briefcase, // Ikon untuk "Aset & Investasi"
-  CreditCard, // Ikon untuk "Penagihan"
+  Briefcase,
+  CreditCard,
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,151 +14,128 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import LogoutDialog from "../navbar/logout-dialog";
 
-/**
- * Props untuk komponen Sidebar.
- * - `isSidebarOpen`: menentukan apakah sidebar dalam kondisi terbuka (expanded)
- * atau tertutup (collapsed).
- */
 interface SidebarProps {
   isSidebarOpen: boolean;
 }
 
-// --- Struktur Navigasi Baru (Disederhanakan) ---
-
-// 1. Item Navigasi Tingkat Atas
-// "Laporan" dipindahkan ke sini karena grup "Analisis" dihapus
 const topLevelNavItems = [
   { label: "Dashboard", href: "/overview", icon: LayoutGrid },
   { label: "Transaksi", href: "/transactions", icon: ReceiptText },
-  { label: "Laporan", href: "/reports", icon: TrendingUp }, 
+  { label: "Laporan", href: "/reports", icon: TrendingUp },
 ];
 
-// 2. Item Navigasi Bawah
 const bottomNavItems = [
   { label: "Aset & Investasi", href: "/assets", icon: Briefcase },
   { label: "Penagihan", href: "/billing", icon: CreditCard },
   { label: "Pengaturan", href: "/settings", icon: Settings },
 ];
 
-/**
- * Komponen Sidebar utama.
- * Menampilkan logo aplikasi dan daftar navigasi,
- * serta dapat bertransisi antara mode terbuka dan tertutup.
- */
 function Sidebar({ isSidebarOpen }: SidebarProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const location = useLocation();
 
-  // Fungsi pembantu untuk mengecek apakah path saat ini cocok
   const isActive = (href: string) => location.pathname.startsWith(href);
 
   const NavLink = ({
     href,
     icon: Icon,
     label,
-    className: additionalClassName = "",
   }: {
     href: string;
     icon: React.ElementType;
     label: string;
-    className?: string;
   }) => (
     <Link
       to={href}
       className={cn(
-        // Gaya dasar:
-        "flex items-center rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary",
-
-        // Beri warna berbeda untuk halaman aktif
-        isActive(href) && "bg-muted text-primary",
-
-        // Logika untuk alignment & gap
-        !isSidebarOpen
-          ? "justify-center" // Saat tertutup: HANYA justify-center.
-          : "gap-3", // Saat terbuka: BARU tambahkan 'gap-3'.
-
-        // Tambahkan className tambahan jika ada
-        additionalClassName
+        "group flex items-center rounded-lg py-3 text-muted-foreground transition-all duration-300 hover:text-primary relative overflow-hidden",
+        // [LOGIKA POSISI]
+        // Open: px-3 (standar)
+        // Closed: px-[18px] (presisi tengah: (72px - 16px padding container - 20px icon) / 2 = 18px)
+        isSidebarOpen ? "px-3" : "px-[18px]",
+        isActive(href) && "bg-muted text-primary"
       )}
     >
-      <Icon className="h-5 w-5" />
+      {/* Ikon */}
+      <Icon className={cn("h-5 w-5 shrink-0 transition-all duration-300")} />
 
+      {/* Teks dengan animasi Width & Opacity */}
       <span
         className={cn(
-          "whitespace-nowrap transition-opacity duration-200",
-          // 'hidden' akan menghapus span dari DOM flow.
-          !isSidebarOpen ? "opacity-0 hidden" : "opacity-100"
+          "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out",
+          isSidebarOpen
+            ? "max-w-[200px] opacity-100 ml-3 translate-x-0"
+            : "max-w-0 opacity-0 -translate-x-5"
         )}
       >
         {label}
       </span>
+
+      {/* Tooltip sederhana saat sidebar tertutup */}
+      {!isSidebarOpen && (
+        <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 border">
+          {label}
+        </div>
+      )}
     </Link>
   );
 
   return (
-    <div className="flex h-full max-h-screen flex-col gap-2">
-      {/* ============================================
-                ======== LOGO HEADER ===============
-                ============================================
-      */}
+    <div className="flex h-full flex-col gap-2 py-2">
+      {/* --- Header Logo --- */}
       <div
         className={cn(
-          "flex h-14 items-center px-4 transition-all duration-300 lg:h-[60px]",
-          isSidebarOpen ? "lg:px-6" : "lg:px-5"
+          "flex h-14 items-center transition-all duration-300 lg:h-[60px]",
+          // Padding logo disamakan logikanya agar sejajar dengan menu
+          isSidebarOpen ? "px-6" : "px-[18px]"
         )}
       >
-        <Logo
-          showText={isSidebarOpen}
-          className={cn(!isSidebarOpen && "w-full justify-center")}
-          color="foreground"
-        />
+        <Logo showText={isSidebarOpen} color="foreground" />
       </div>
 
-      {/* ============================================
-                ============== NAVIGASI MENU ===============
-                ============================================
-      */}
-      <div className="flex-1 overflow-y-auto">
-        {/* Tambahkan 'gap-y-1' untuk memberi jarak vertikal antar item */}
-        <nav className="grid items-start px-2 py-2 text-sm font-medium lg:px-4 gap-y-1">
-          {/* 1. Render Item Tingkat Atas */}
+      {/* --- Menu Navigasi --- */}
+      {/* Class scrollbar-hide ditambahkan untuk menyembunyikan scrollbar native */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <nav className="grid items-start px-2 gap-y-1">
           {topLevelNavItems.map((item) => (
             <NavLink key={item.href} {...item} />
           ))}
 
-          {/* 2. Render Item Bawah */}
           {bottomNavItems.map((item) => (
             <NavLink key={item.href} {...item} />
           ))}
-
-          {/* Logout Button */}
-          <LogoutButton
-            isSidebarOpen={isSidebarOpen}
-            onClick={() => setIsDialogOpen(true)}
-          />
         </nav>
       </div>
+
+      {/* --- Footer (Logout) --- */}
+      <div className="p-2 mt-auto">
+        <Button
+          onClick={() => setIsDialogOpen(true)}
+          variant="ghost"
+          className={cn(
+            "w-full transition-all duration-300 group flex items-center relative overflow-hidden",
+            "text-red-500 hover:text-white hover:bg-red-500 dark:hover:bg-red-950/30",
+            isSidebarOpen ? "px-3 justify-start" : "px-[18px] justify-start"
+          )}
+        >
+          <LogOut className="h-5 w-5 shrink-0 transition-all duration-300" />
+
+          <span
+            className={cn(
+              "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out",
+              isSidebarOpen
+                ? "max-w-[200px] opacity-100 ml-3 translate-x-0"
+                : "max-w-0 opacity-0 -translate-x-5"
+            )}
+          >
+            Keluar
+          </span>
+        </Button>
+      </div>
+
       <LogoutDialog isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} />
     </div>
   );
 }
-
-// Logout Button Component
-const LogoutButton = ({ isSidebarOpen, onClick }: { isSidebarOpen: boolean; onClick: () => void }) => {
-  return (
-    <Button
-      onClick={onClick}
-      variant="ghost"
-      className={cn(
-        " mt-70 items-center w-full text-red-400 hover:text-white rounded-lg px-3 py-3 transition-all",
-        !isSidebarOpen ? "justify-center" : "gap-3",
-        "bg-red-500 hover:bg-red-600 text-white"
-      )}
-    >
-      <LogOut className={cn(isSidebarOpen ? "h-5 w-5" : "h-5 w-5")} />
-      {isSidebarOpen && <span className="whitespace-nowrap">Keluar</span>}
-    </Button>
-  );
-};
 
 export default Sidebar;
