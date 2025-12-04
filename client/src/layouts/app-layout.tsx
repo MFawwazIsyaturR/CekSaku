@@ -25,7 +25,7 @@ function AppLayout() {
           =============== SIDEBAR AREA ===============
           ============================================
       */}
-     <div className="hidden border-r bg-background md:block relative z-40">
+     <div className="hidden border-r bg-background md:block sticky top-0 h-screen z-40">
       <Sidebar isSidebarOpen={isSidebarOpen} />
      </div>
 
