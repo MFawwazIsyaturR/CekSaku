@@ -4,25 +4,13 @@ import {
   LayoutGrid,
   TrendingUp,
   ReceiptText,
-  ClipboardList, // Ikon untuk "Perencanaan"
-  Target, // Ikon untuk "Anggaran"
-  Goal, // Ikon untuk "Tujuan"
-  Landmark, // Ikon untuk "Utang"
-  PieChart, // Ikon untuk "Analisis"
-  BarChart, // Ikon untuk "Analitik"
   Briefcase, // Ikon untuk "Aset & Investasi"
   CreditCard, // Ikon untuk "Penagihan"
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "../logo/logo";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"; // Mengimpor komponen Accordion
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import LogoutDialog from "../navbar/logout-dialog";
 
@@ -35,34 +23,22 @@ interface SidebarProps {
   isSidebarOpen: boolean;
 }
 
-// --- Struktur Navigasi Baru ---
+// --- Struktur Navigasi Baru (Disederhanakan) ---
 
-// 1. Item Navigasi Tingkat Atas (Selalu Terlihat)
+// 1. Item Navigasi Tingkat Atas
+// "Laporan" dipindahkan ke sini karena grup "Analisis" dihapus
 const topLevelNavItems = [
   { label: "Dashboard", href: "/overview", icon: LayoutGrid },
   { label: "Transaksi", href: "/transactions", icon: ReceiptText },
+  { label: "Laporan", href: "/reports", icon: TrendingUp }, 
 ];
 
-// 2. Item untuk Kategori "Perencanaan"
-const planningItems = [
-  { label: "Anggaran", href: "/budget", icon: Target }, // Rute baru (contoh)
-  { label: "Tujuan", href: "/goals", icon: Goal }, // Rute baru (contoh)
-  { label: "Utang", href: "/debt", icon: Landmark }, // Rute baru (contoh)
-];
-
-// 3. Item untuk Kategori "Analisis"
-const analysisItems = [
-  { label: "Analitik", href: "/analytics", icon: BarChart }, // Rute baru (contoh)
-  { label: "Laporan", href: "/reports", icon: TrendingUp },
-];
-
-// 4. Item Navigasi Bawah (Setelah Kategori)
+// 2. Item Navigasi Bawah
 const bottomNavItems = [
-  { label: "Aset & Investasi", href: "/assets", icon: Briefcase }, // Rute baru (contoh)
+  { label: "Aset & Investasi", href: "/assets", icon: Briefcase },
   { label: "Penagihan", href: "/billing", icon: CreditCard },
   { label: "Pengaturan", href: "/settings", icon: Settings },
 ];
-// --- Akhir Struktur Navigasi Baru ---
 
 /**
  * Komponen Sidebar utama.
@@ -73,46 +49,25 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const location = useLocation();
 
-  // Fungsi pembantu untuk mengecek apakah path saat ini cocok (termasuk sub-rute)
+  // Fungsi pembantu untuk mengecek apakah path saat ini cocok
   const isActive = (href: string) => location.pathname.startsWith(href);
-
-  // Fungsi untuk mengecek apakah ada item anak yang aktif
-  const isCategoryActive = (items: typeof planningItems) =>
-    items.some((item) => isActive(item.href));
-
-  // Tentukan accordion mana yang harus terbuka berdasarkan rute aktif
-  const defaultAccordionValue = React.useMemo(() => {
-    const activeCategories = [];
-    if (isCategoryActive(planningItems)) activeCategories.push("perencanaan");
-    if (isCategoryActive(analysisItems)) activeCategories.push("analisis");
-    return activeCategories;
-  }, [location.pathname]);
 
   const NavLink = ({
     href,
     icon: Icon,
     label,
-    isChild = false,
     className: additionalClassName = "",
   }: {
     href: string;
     icon: React.ElementType;
     label: string;
-    isChild?: boolean;
     className?: string;
   }) => (
     <Link
       to={href}
       className={cn(
         // Gaya dasar:
-        "flex items-center rounded-lg px-3 text-muted-foreground transition-all hover:text-primary",
-
-        // [PERUBAHAN 1] Padding vertikal dibuat kondisional
-        // py-2 (lebih kecil) jika isChild, jika tidak py-3 (standar)
-        isChild ? "py-2" : "py-3",
-
-        // Gaya item anak (hanya jika sidebar terbuka)
-        isChild && isSidebarOpen && "ml-4",
+        "flex items-center rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary",
 
         // Beri warna berbeda untuk halaman aktif
         isActive(href) && "bg-muted text-primary",
@@ -126,19 +81,13 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
         additionalClassName
       )}
     >
-      {/* [PERUBAHAN 2] Ukuran ikon dibuat kondisional
-          h-4 w-4 (lebih kecil) jika isChild, jika tidak h-5 w-5 (standar) */}
-      <Icon className={cn(isChild ? "h-4 w-4" : "h-5 w-5")} />
+      <Icon className="h-5 w-5" />
 
       <span
         className={cn(
           "whitespace-nowrap transition-opacity duration-200",
-          // [PERBAIKAN FINAL] 'hidden' akan menghapus span dari DOM flow.
-          !isSidebarOpen ? "opacity-0 hidden" : "opacity-100",
-
-          // [PERUBAHAN 3] Ukuran teks dibuat kondisional
-          // text-xs (lebih kecil) jika isChild
-          isChild && "text-xs"
+          // 'hidden' akan menghapus span dari DOM flow.
+          !isSidebarOpen ? "opacity-0 hidden" : "opacity-100"
         )}
       >
         {label}
@@ -177,94 +126,7 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
             <NavLink key={item.href} {...item} />
           ))}
 
-          {/* 2. Render Kategori yang Bisa Diciutkan (Accordion) */}
-          <Accordion
-            type="multiple"
-            defaultValue={defaultAccordionValue}
-            className="w-full"
-          >
-            {/* Kategori: Perencanaan */}
-            <AccordionItem value="perencanaan" className="border-b-0">
-              <AccordionTrigger
-                className={cn(
-                  // [PERBAIKAN FINAL] Gaya dasar: HAPUS 'gap-3' dari sini.
-                  "flex items-center w-full rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary hover:no-underline",
-                  "text-sm font-medium",
-                  !isSidebarOpen
-                    ? "justify-center" // Tertutup: Center
-                    : "gap-3", // Terbuka: Tambah gap
-                  isCategoryActive(planningItems) && "text-primary",
-                  // [PERBAIKAN FINAL] Sembunyikan ikon chevron (panah)
-                  // bawaan shadcn saat sidebar tertutup.
-                  "[&>.shrink-0]:hidden"
-                )}
-              >
-                <ClipboardList className="h-5 w-5" />
-                <span
-                  className={cn(
-                    "flex-1 text-left whitespace-nowrap transition-opacity duration-200",
-                    // [PERBAIKAN FINAL] 'hidden' juga berlaku di sini.
-                    !isSidebarOpen ? "opacity-0 hidden" : "opacity-100"
-                  )}
-                >
-                  Perencanaan
-                </span>
-              </AccordionTrigger>
-              {/* Tambah 'pt-1' dan 'space-y-1' untuk jarak antar item di dalam accordion */}
-              <AccordionContent className="pb-0 pt-1 space-y-1">
-                {planningItems.map((item) => (
-                  <NavLink
-                    key={item.href}
-                    {...item}
-                    isChild
-                    className="scale-105" // Slightly enlarge content in dropdown
-                  />
-                ))}
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Kategori: Analisis */}
-            <AccordionItem value="analisis" className="border-b-0">
-              <AccordionTrigger
-                className={cn(
-                  // [PERBAIKAN FINAL] Gaya dasar: HAPUS 'gap-3' dari sini.
-                  "flex items-center w-full rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary hover:no-underline",
-                  "text-sm font-medium",
-                  !isSidebarOpen
-                    ? "justify-center" // Tertutup: Center
-                    : "gap-3", // Terbuka: Tambah gap
-                  isCategoryActive(analysisItems) && "text-primary",
-                  // [PERBAIKAN FINAL] Sembunyikan ikon chevron (panah)
-                  // bawaan shadcn saat sidebar tertutup.
-                  "[&>.shrink-0]:hidden"
-                )}
-              >
-                <PieChart className="h-5 w-5" />
-                <span
-                  className={cn(
-                    "flex-1 text-left whitespace-nowrap transition-opacity duration-200",
-                    // [PERBAIKAN FINAL] 'hidden' juga berlaku di sini.
-                    !isSidebarOpen ? "opacity-0 hidden" : "opacity-100"
-                  )}
-                >
-                  Analisis
-                </span>
-              </AccordionTrigger>
-              {/* Tambah 'pt-1' dan 'space-y-1' untuk jarak antar item di dalam accordion */}
-              <AccordionContent className="pb-0 pt-1 space-y-1">
-                {analysisItems.map((item) => (
-                  <NavLink
-                    key={item.href}
-                    {...item}
-                    isChild
-                    className="scale-105" // Slightly enlarge content in dropdown
-                  />
-                ))}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
-          {/* 3. Render Item Bawah */}
+          {/* 2. Render Item Bawah */}
           {bottomNavItems.map((item) => (
             <NavLink key={item.href} {...item} />
           ))}
