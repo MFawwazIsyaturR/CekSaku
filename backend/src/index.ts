@@ -21,6 +21,7 @@ import analyticsRoutes from "./routes/analytics.route";
 import connectDB from "./config/database.config";
 import { initializeMidtrans } from "./config/midtrans.config";
 import paymentRoutes from "./routes/payment.route";
+import assetRoutes from "./routes/asset.route";
 
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
@@ -54,6 +55,7 @@ app.use(`${BASE_PATH}/transaction`, passportAuthenticateJwt, transactionRoutes);
 app.use(`${BASE_PATH}/report`, passportAuthenticateJwt, reportRoutes);
 app.use(`${BASE_PATH}/analytics`, passportAuthenticateJwt, analyticsRoutes);
 app.use(`${BASE_PATH}/payment`, paymentRoutes);
+app.use(`${BASE_PATH}/asset`, passportAuthenticateJwt, assetRoutes);
 
 app.use(errorHandler);
 
