@@ -25,7 +25,6 @@ const assetSchema = new Schema<AssetDocument>(
       type: Schema.Types.ObjectId,
       required: true,
       ref: "User",
-      index: true, 
     },
     name: {
       type: String,
@@ -41,6 +40,7 @@ const assetSchema = new Schema<AssetDocument>(
       type: Number,
       required: true,
       default: 0,
+      // Simpan di DB sebagai cents (dikali 100), baca sebagai unit biasa (dibagi 100)
       set: (value: number) => convertToCents(value),
       get: (value: number) => convertToDollarUnit(value),
     },
@@ -55,12 +55,10 @@ const assetSchema = new Schema<AssetDocument>(
   },
   {
     timestamps: true,
-    toJSON: { getters: true },
+    toJSON: { getters: true }, // Penting agar getter amount berjalan saat dikirim ke frontend
     toObject: { getters: true },
   }
 );
-
-assetSchema.index({ userId: 1, createdAt: -1 });
 
 const AssetModel = mongoose.model<AssetDocument>("Asset", assetSchema);
 

@@ -7,6 +7,7 @@ import ExpensePieChart from "./expense-pie-chart";
 import DashboardRecentTransactions from "./dashboard-recent-transactions";
 import { DateRangeType } from "@/components/date-range-select";
 import DashboardDataChart from "./dashboard-data-chart"; // <-- Impor kembali Data Chart
+import BudgetWidget from "./_component/budget-widget";
 
 const Dashboard = () => {
   const [dateRange, setDateRange] = useState<DateRangeType>(null);
@@ -17,9 +18,12 @@ const Dashboard = () => {
 
       {/* 1. Header Halaman */}
       <DashboardPageHeader dateRange={dateRange} setDateRange={setDateRange} />
+      
 
       {/* 2. Kartu Ringkasan (Summary Cards) */}
       <DashboardStats dateRange={dateRange} />
+
+      
 
       {/* 3. Grid untuk Quick Actions dan Chart */}
       {/* Gunakan grid 3 kolom di layar besar (lg) */}
@@ -41,11 +45,17 @@ const Dashboard = () => {
         </div>
       </div>
 
+       <div className="w-full">
+      <BudgetWidget />
+      </div>
+
+
       {/* 4. Riwayat Transaksi (Di luar grid, lebar penuh) */}
       <div className="w-full">
         <DashboardRecentTransactions />
       </div>
 
+     
     </div>
   );
 };
