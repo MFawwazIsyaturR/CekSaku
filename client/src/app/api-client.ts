@@ -17,7 +17,7 @@ export const apiClient = createApi({
     reducerPath: 'api', // Add API client reducer to root reducer
     baseQuery: baseQuery,
     refetchOnMountOrArgChange: true, // Refetch on mount or arg change
-    tagTypes: ['transactions','analytics','billingSubscription', 'assets'], // Tag types for RTK Query
+    tagTypes: ['transactions','analytics','billingSubscription', 'assets', 'budgets'], // Tag types for RTK Query
     endpoints: () => ({}), // Endpoints for RTK Query
   })
   
