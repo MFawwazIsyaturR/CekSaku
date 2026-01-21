@@ -9,7 +9,7 @@ type Params = {
   from?: string;
 };
 
-const mailer_sender = `CekSaku <${Env.RESEND_MAILER_SENDER}>`;
+const mailer_sender = `CekSaku <noreply@ceksaku.com>`;
 
 export const sendEmail = async ({
   to,
@@ -43,6 +43,29 @@ export const sendPasswordResetEmail = async (
         <strong>${token}</strong>
       </div>
       <p>Jika Anda tidak meminta reset kata sandi, Anda bisa mengabaikan email ini.</p>
+      <p>Terima kasih,<br/>Tim CekSaku</p>
+    </div>
+  `;
+
+  return sendEmail({ to, subject, text, html });
+};
+
+export const sendRegistrationVerificationEmail = async (
+  to: string,
+  username: string,
+  token: string
+) => {
+  const subject = "Verifikasi Email Akun CekSaku Anda";
+  const text = `Hai ${username},\n\nGunakan kode berikut untuk memverifikasi akun Anda: ${token}\n\nKode ini akan kedaluwarsa dalam 15 menit.\n\nJika Anda tidak mendaftar di CekSaku, abaikan saja email ini.\n`;
+  const html = `
+    <div style="font-family: sans-serif; padding: 20px; color: #333;">
+      <h2>Verifikasi Email CekSaku</h2>
+      <p>Hai ${username},</p>
+      <p>Terima kasih telah mendaftar di CekSaku! Gunakan kode di bawah ini untuk memverifikasi email Anda. Kode ini hanya berlaku selama 15 menit.</p>
+      <div style="background-color: #f2f2f2; padding: 10px 20px; text-align: center; font-size: 24px; letter-spacing: 5px; margin: 20px 0; border-radius: 5px;">
+        <strong>${token}</strong>
+      </div>
+      <p>Jika Anda tidak mendaftar di CekSaku, Anda bisa mengabaikan email ini.</p>
       <p>Terima kasih,<br/>Tim CekSaku</p>
     </div>
   `;
