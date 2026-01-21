@@ -108,7 +108,6 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
 }
 
 .info-section {
@@ -326,10 +325,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
 }
-
-/* TAMBAHKAN BLOK CSS INI DI BAGIAN BAWAH file landing.css */
 
 .final-section {
   position: relative; /* Diperlukan untuk efek gradien di background */
