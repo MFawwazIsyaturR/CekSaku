@@ -17,11 +17,13 @@ import ContactPage from "@/pages/landing/ContactPage";
 import BillingPage from "@/pages/billing";
 import Payment from "@/pages/settings/payment";
 import AssetsPage from "@/pages/assets";
+import VerifyEmail from "@/pages/auth/_component/verify-email";
 
 export const authenticationRoutePaths = [
   { path: AUTH_ROUTES.LANDING, element: <LandingPage /> },
   { path: AUTH_ROUTES.SIGN_IN, element: <SignIn /> },
   { path: AUTH_ROUTES.SIGN_UP, element: <SignUp /> },
+  { path: AUTH_ROUTES.VERIFY_EMAIL, element: <VerifyEmail /> },
   { path: "/auth/google/callback", element: <GoogleCallback /> },
   { path: "/auth/github/callback", element: <GithubCallback /> },
   { path: AUTH_ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },

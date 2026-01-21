@@ -6,6 +6,7 @@ export const isAuthRoute = (pathname: string): boolean => {
     LANDING: "/",
     SIGN_IN: "/login",
     SIGN_UP: "/register",
+    VERIFY_EMAIL: "/verify-email",
     FORGOT_PASSWORD: "/forgot-password",
   };
   
