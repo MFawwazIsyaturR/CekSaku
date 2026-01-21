@@ -9,6 +9,8 @@ import {
   registerController,
   refreshController,
   logoutController,
+  sendRegistrationOTPController,
+  verifyRegistrationOTPController,
 } from "../controllers/auth.controller";
 import rateLimit from "express-rate-limit";
 
@@ -48,11 +50,17 @@ const authRoutes = Router();
 // Penerapan registerLimiter HANYA ke rute /register
 authRoutes.post("/register", registerLimiter, registerController);
 
+// Rute untuk mengirim OTP verifikasi registrasi
+authRoutes.post("/send-registration-otp", registerLimiter, sendRegistrationOTPController);
+
+// Rute untuk verifikasi OTP registrasi
+authRoutes.post("/verify-registration-otp", registerLimiter, verifyRegistrationOTPController);
+
 // Penerapan strictAuthLimiter HANYA ke rute /login
 authRoutes.post("/login", strictAuthLimiter, loginController);
 
-authRoutes.post("/google", googleLoginController); 
-authRoutes.post("/github", githubLoginController); 
+authRoutes.post("/google", googleLoginController);
+authRoutes.post("/github", githubLoginController);
 
 // Penerapan strictAuthLimiter HANYA ke rute /forgot-password
 authRoutes.post("/forgot-password", strictAuthLimiter, forgotPasswordController);

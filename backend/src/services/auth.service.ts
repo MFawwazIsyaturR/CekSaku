@@ -17,9 +17,10 @@ import { signJwtToken } from "../utils/jwt";
 import { OAuth2Client } from "google-auth-library";
 import { Env } from "../config/env.config";
 import axios from "axios";
-import { sendPasswordResetEmail } from "../mailers/mailer";
+import { sendPasswordResetEmail, sendRegistrationVerificationEmail } from "../mailers/mailer";
 import crypto from "crypto";
 import PasswordResetTokenModel from "../models/password-reset-token.model";
+import RegistrationOTPModel from "../models/registration-otp.model";
 import bcrypt from 'bcrypt';
 
 
@@ -32,33 +33,47 @@ const googleClient = new OAuth2Client({
 export const registerService = async (body: RegisterSchemaType) => {
   const { email } = body;
   const session = await mongoose.startSession();
+  let userResponse;
+
   try {
-    let userResponse;
     await session.withTransaction(async () => {
       const existingUser = await UserModel.findOne({ email }).session(session);
       if (existingUser) throw new UnauthorizedException("User already exists");
-      
-      const newUser = new UserModel({ ...body });
+
+      // Create user with email verification status set to false initially
+      const newUser = new UserModel({
+        ...body,
+        isEmailVerified: false // User starts as unverified
+      });
       await newUser.save({ session });
-      
+
       const reportSetting = new ReportSettingModel({
         userId: newUser._id,
         frequency: ReportFrequencyEnum.MONTHLY,
         isEnabled: true,
         // FIX: Tambahkan argumen frekuensi
-        nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY), 
+        nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY),
         lastSentDate: null,
       });
       await reportSetting.save({ session });
-      
+
       userResponse = { user: newUser.omitPassword() };
     });
-    return userResponse;
   } catch (error) {
     throw error;
   } finally {
     await session.endSession();
   }
+
+  // Send registration verification OTP after successful registration (outside transaction)
+  try {
+    await sendRegistrationOTPService(email);
+  } catch (error) {
+    // Log the error but don't throw it, so registration still succeeds even if email fails
+    console.error('Failed to send registration OTP:', error);
+  }
+
+  return userResponse;
 };
 
 export const loginService = async (body: LoginSchemaType) => {
@@ -68,6 +83,11 @@ export const loginService = async (body: LoginSchemaType) => {
 
   const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) throw new UnauthorizedException("Invalid email/password");
+
+  // Check if user has verified their email
+  if (!user.isEmailVerified) {
+    throw new UnauthorizedException("Please verify your email address before logging in");
+  }
 
   const { token, expiresAt } = signJwtToken({ userId: user.id });
   const reportSetting = await ReportSettingModel.findOne(
@@ -307,6 +327,69 @@ export const refreshTokenService = async (userId: string) => {
 
 export const logoutService = async (userId: string) => {
   // In a real application, you might want to implement token blacklisting
-  // For now, we just return a success message
+  // For now, we'll just return a success message
   return { message: "User logged out successfully" };
+};
+
+export const sendRegistrationOTPService = async (email: string) => {
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+
+  // Delete any existing unverified OTP for this user
+  await RegistrationOTPModel.deleteMany({
+    userId: user._id,
+    isVerified: false
+  });
+
+  const otp = crypto.randomInt(100000, 999999).toString();
+  const expiration = new Date(Date.now() + 15 * 60 * 1000);
+
+  await new RegistrationOTPModel({
+    userId: user._id,
+    email: user.email,
+    token: otp,
+    expiresAt: expiration,
+    isVerified: false,
+  }).save();
+
+  await sendRegistrationVerificationEmail(user.email, user.name, otp);
+  return { message: "Registration verification email sent." };
+};
+
+export const verifyRegistrationOTPService = async (email: string, token: string) => {
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+
+  const otpRecord = await RegistrationOTPModel.findOne({
+    userId: user._id,
+    email,
+    isVerified: false,
+    expiresAt: { $gt: new Date() }
+  });
+
+  if (!otpRecord) {
+    return { success: false, user: null };
+  }
+
+  const isValid = await bcrypt.compare(token, otpRecord.token);
+  if (!isValid) {
+    return { success: false, user: null };
+  }
+
+  // Mark OTP as verified
+  otpRecord.isVerified = true;
+  await otpRecord.save();
+
+  // Mark user as verified
+  user.isEmailVerified = true;
+  await user.save();
+
+  return {
+    success: true,
+    user: user.omitPassword()
+  };
 };

@@ -12,6 +12,7 @@ interface User {
   name: string;
   email: string;
   profilePicture: string;
+  isEmailVerified?: boolean;
   subscriptionStatus?: 'active' | 'cancelled' | 'pending' | 'expired';
   subscriptionPlan?: string;
   subscriptionOrderId?: string;

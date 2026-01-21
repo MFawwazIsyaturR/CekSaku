@@ -74,7 +74,16 @@ const handleGitHubLoginClick = () => {
         setTimeout(() => navigate(PROTECTED_ROUTES.OVERVIEW), 1000);
       })
       .catch((error) => {
-        toast.error(error.data?.message || "Gagal masuk");
+        const errorMessage = error.data?.message || "Gagal masuk";
+
+        // Check if the error is related to email verification
+        if (errorMessage.includes("verify your email") || errorMessage.includes("verifikasi")) {
+          toast.error(errorMessage);
+          // Redirect to verify email page with the email
+          setTimeout(() => navigate(`${AUTH_ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`), 1500);
+        } else {
+          toast.error(errorMessage);
+        }
       });
   };
 

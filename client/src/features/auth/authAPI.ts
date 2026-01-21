@@ -66,6 +66,20 @@ export const authApi = apiClient.injectEndpoints({
         body: credentials,
       }),
     }),
+    sendRegistrationOTP: builder.mutation({
+      query: (credentials: { email: string }) => ({
+        url: "/auth/send-registration-otp",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
+    verifyRegistrationOTP: builder.mutation({
+      query: (credentials: { email: string; token: string }) => ({
+        url: "/auth/verify-registration-otp",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
   }),
 });
 
@@ -77,6 +91,8 @@ export const {
   useGoogleLoginMutation,
   useGithubLoginMutation,
   useForgotPasswordMutation,
-  useVerifyResetTokenMutation, 
+  useVerifyResetTokenMutation,
   useResetPasswordMutation,
+  useSendRegistrationOTPMutation,
+  useVerifyRegistrationOTPMutation,
 } = authApi;

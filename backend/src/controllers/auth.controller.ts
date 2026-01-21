@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HTTPSTATUS } from "../config/http.config";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { googleLoginSchema, loginSchema, registerSchema } from "../validators/auth.validator";
-import { githubLoginService, googleLoginService, loginService, registerService, refreshTokenService, logoutService } from "../services/auth.service";
+import { githubLoginService, googleLoginService, loginService, registerService, refreshTokenService, logoutService, sendRegistrationOTPService, verifyRegistrationOTPService } from "../services/auth.service";
 import { BadRequestException, UnauthorizedException } from "../utils/app-error";
 import { forgotPasswordSchema, resetPasswordSchema, verifyResetTokenSchema } from "../validators/auth.validator";
 import { forgotPasswordService, resetPasswordService, verifyResetTokenService} from "../services/auth.service";
@@ -41,7 +41,7 @@ export const loginController = asyncHandler(
 
 export const googleLoginController = asyncHandler(
   async (req: Request, res: Response) => {
-    // 1. Validasi body HARUS berupa JSON dengan properti 'code'
+
     const validationResult = googleLoginSchema.safeParse(req.body);
 
     if (!validationResult.success) {
@@ -50,11 +50,9 @@ export const googleLoginController = asyncHandler(
     
     const { code } = validationResult.data;
 
-    // 2. Panggil service dengan code yang sudah divalidasi
     const { user, accessToken, expiresAt, reportSetting } =
       await googleLoginService(code);
 
-    // 3. Kirim response
     return res.status(HTTPSTATUS.OK).json({
       message: "User logged in successfully with Google",
       user,
@@ -125,5 +123,31 @@ export const logoutController = asyncHandler(
 
     const result = await logoutService(userId);
     return res.status(HTTPSTATUS.OK).json(result);
+  }
+);
+
+export const sendRegistrationOTPController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
+    await sendRegistrationOTPService(email);
+    return res.status(HTTPSTATUS.OK).json({ message: "Registration OTP sent successfully" });
+  }
+);
+
+export const verifyRegistrationOTPController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email, token } = req.body;
+    const result = await verifyRegistrationOTPService(email, token);
+
+    if (result.success) {
+      return res.status(HTTPSTATUS.OK).json({
+        message: "Email verified successfully",
+        data: result.user
+      });
+    } else {
+      return res.status(HTTPSTATUS.UNAUTHORIZED).json({
+        message: "Invalid or expired OTP"
+      });
+    }
   }
 );

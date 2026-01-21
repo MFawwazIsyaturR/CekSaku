@@ -10,6 +10,7 @@ export interface UserDocument extends Document {
   subscriptionPlan: string;
   subscriptionOrderId: string;
   subscriptionExpiredAt: Date;
+  isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
   comparePassword: (password: string) => Promise<boolean>;
@@ -46,6 +47,10 @@ const userSchema = new Schema<UserDocument>(
 );
 
 userSchema.add({
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
+  },
   subscriptionStatus: {
     type: String,
     enum: ['active', 'cancelled', 'pending', 'expired'],

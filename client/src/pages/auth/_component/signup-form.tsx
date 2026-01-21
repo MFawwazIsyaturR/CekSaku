@@ -19,6 +19,7 @@ import { Eye, EyeOff, Loader } from "lucide-react";
 import {
   useRegisterMutation,
   useGoogleLoginMutation,
+  useSendRegistrationOTPMutation,
 } from "@/features/auth/authAPI";
 import { useAppDispatch } from "@/app/hook";
 import { setCredentials } from "@/features/auth/authSlice";
@@ -84,9 +85,9 @@ const handleGitHubLoginClick = () => {
     register(values)
       .unwrap()
       .then((data) => {
-        dispatch(setCredentials(data));
-        toast.success("Pendaftaran berhasil");
-        setTimeout(() => navigate(PROTECTED_ROUTES.OVERVIEW), 1000);
+        // After successful registration, navigate to email verification page
+        toast.success("Pendaftaran berhasil! Silakan verifikasi email Anda.");
+        setTimeout(() => navigate(`${AUTH_ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`), 1000);
       })
       .catch((error) => {
         toast.error(error.data?.message || "Gagal mendaftar");
