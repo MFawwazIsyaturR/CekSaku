@@ -34,11 +34,22 @@ export const authenticationRoutePaths = [
 ];
 
 import GlobalStats from "@/pages/admin/GlobalStats";
+import TransactionAudit from "@/pages/admin/TransactionAudit";
 
 export const adminRoutePaths = [
   { path: PROTECTED_ROUTES.ADMIN_DASHBOARD, element: <AdminDashboard /> },
   { path: PROTECTED_ROUTES.ADMIN_USERS, element: <UserList /> },
   { path: PROTECTED_ROUTES.ADMIN_STATS, element: <GlobalStats /> },
+  { path: PROTECTED_ROUTES.ADMIN_TRANSACTIONS, element: <TransactionAudit /> },
+  {
+    path: PROTECTED_ROUTES.ADMIN_SETTINGS,
+    element: <Settings />,
+    children: [
+      { index: true, element: <Account /> },
+      { path: "appearance", element: <Appearance /> },
+      { path: "security", element: <Security /> },
+    ],
+  },
 ];
 
 export const protectedRoutePaths = [
@@ -51,11 +62,10 @@ export const protectedRoutePaths = [
     path: PROTECTED_ROUTES.SETTINGS,
     element: <Settings />,
     children: [
-      { index: true, element: <Account /> }, // Default route
-      { path: PROTECTED_ROUTES.SETTINGS, element: <Account /> },
-      { path: PROTECTED_ROUTES.SETTINGS_APPEARANCE, element: <Appearance /> },
-      { path: PROTECTED_ROUTES.SETTINGS_SECURITY, element: <Security /> },
-      { path: PROTECTED_ROUTES.SETTINGS_PAYMENT, element: <Payment /> },
+      { index: true, element: <Account /> },
+      { path: "appearance", element: <Appearance /> },
+      { path: "security", element: <Security /> },
+      { path: "pembayaran", element: <Payment /> },
     ],
   },
 ];

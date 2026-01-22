@@ -24,4 +24,9 @@ export const PROTECTED_ROUTES = {
   ADMIN_DASHBOARD: "/admin",
   ADMIN_USERS: "/admin/users",
   ADMIN_STATS: "/admin/stats",
+  ADMIN_TRANSACTIONS: "/admin/transactions",
+  ADMIN_SETTINGS: "/admin/settings",
+  ADMIN_SETTINGS_APPEARANCE: "/admin/settings/appearance",
+  ADMIN_SETTINGS_SECURITY: "/admin/settings/security",
+  ADMIN_SETTINGS_PAYMENT: "/admin/settings/pembayaran",
 };

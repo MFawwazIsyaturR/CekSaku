@@ -21,6 +21,9 @@ const GlobalStats = () => {
         totalUsers: 0,
         totalTransactions: 0,
         totalTransactionAmount: 0,
+        activeUsers: 0,
+        adminCount: 0,
+        todayTransactions: 0,
     };
 
     // Stats cards data
@@ -138,10 +141,17 @@ const GlobalStats = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{statsLoading ? "..." : Math.round(stats.totalUsers * 0.78)}</div>
-                        <p className="text-xs text-muted-foreground mt-1">78% dari total pengguna</p>
+                        <div className="text-2xl font-bold">{statsLoading ? "..." : stats.activeUsers.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {stats.totalUsers > 0
+                                ? `${Math.round((stats.activeUsers / stats.totalUsers) * 100)}% dari total pengguna aktif (30 hari terakhir)`
+                                : "0% dari total pengguna"}
+                        </p>
                         <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
-                            <div className="h-full w-[78%] bg-gradient-to-r from-violet-500 to-purple-500 rounded-full" />
+                            <div
+                                className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all"
+                                style={{ width: `${stats.totalUsers > 0 ? (stats.activeUsers / stats.totalUsers) * 100 : 0}%` }}
+                            />
                         </div>
                     </CardContent>
                 </Card>
@@ -154,10 +164,17 @@ const GlobalStats = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{statsLoading ? "..." : Math.max(1, Math.round(stats.totalUsers * 0.02))}</div>
-                        <p className="text-xs text-muted-foreground mt-1">~2% dari total pengguna</p>
+                        <div className="text-2xl font-bold">{statsLoading ? "..." : stats.adminCount.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {stats.totalUsers > 0
+                                ? `${((stats.adminCount / stats.totalUsers) * 100).toFixed(1)}% dari total pengguna`
+                                : "0% dari total pengguna"}
+                        </p>
                         <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
-                            <div className="h-full w-[2%] bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full" />
+                            <div
+                                className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all"
+                                style={{ width: `${stats.totalUsers > 0 ? (stats.adminCount / stats.totalUsers) * 100 : 0}%` }}
+                            />
                         </div>
                     </CardContent>
                 </Card>
@@ -170,10 +187,17 @@ const GlobalStats = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{statsLoading ? "..." : Math.round(stats.totalTransactions * 0.05)}</div>
-                        <p className="text-xs text-muted-foreground mt-1">~5% dari total transaksi</p>
+                        <div className="text-2xl font-bold">{statsLoading ? "..." : stats.todayTransactions.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {stats.totalTransactions > 0
+                                ? `${((stats.todayTransactions / stats.totalTransactions) * 100).toFixed(1)}% dari total transaksi`
+                                : "Baru hari ini"}
+                        </p>
                         <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
-                            <div className="h-full w-[5%] bg-gradient-to-r from-emerald-500 to-green-500 rounded-full" />
+                            <div
+                                className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full transition-all"
+                                style={{ width: `${stats.totalTransactions > 0 ? (stats.todayTransactions / stats.totalTransactions) * 100 : 0}%` }}
+                            />
                         </div>
                     </CardContent>
                 </Card>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"; 
+import { useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useGoogleLoginMutation } from "@/features/auth/authAPI";
 import { useAppDispatch } from "@/app/hook";
@@ -11,7 +11,7 @@ const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [googleLoginCallback] = useGoogleLoginMutation(); 
+  const [googleLoginCallback] = useGoogleLoginMutation();
 
   //  ref untuk melacak apakah proses sudah dijalankan
   const hasProcessed = useRef(false);
@@ -43,16 +43,21 @@ const GoogleCallback = () => {
       .then((data) => {
         dispatch(setCredentials(data));
         toast.success("Masuk dengan Google berhasil");
+
+        const destination = data.user?.role === "admin"
+          ? PROTECTED_ROUTES.ADMIN_DASHBOARD
+          : PROTECTED_ROUTES.OVERVIEW;
+
         // Timeout kecil untuk memastikan state Redux terupdate sebelum navigasi
-        setTimeout(() => navigate(PROTECTED_ROUTES.OVERVIEW, { replace: true }), 100);
+        setTimeout(() => navigate(destination, { replace: true }), 100);
       })
       .catch((error) => {
-         console.error("Login Google Callback Gagal", error);
-         toast.error(error.data?.message || "Gagal memproses login Google.");
+        console.error("Login Google Callback Gagal", error);
+        toast.error(error.data?.message || "Gagal memproses login Google.");
         navigate(AUTH_ROUTES.SIGN_IN, { replace: true });
       });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, navigate, dispatch, googleLoginCallback]); // Hapus 'hasProcessed' dari dependency array
 
   // Tampilkan loading indicator selama proses backend berjalan

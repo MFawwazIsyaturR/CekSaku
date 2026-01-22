@@ -96,7 +96,7 @@ export const getAllTransactionService = async (
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return {
-    transations,
+    transactions: transations,
     pagination: {
       pageSize,
       pageNumber,
@@ -351,7 +351,7 @@ export const exportTransactionsService = async (userId: string) => {
     [
       escapeCsvCell(tx.title),
       escapeCsvCell(tx.type),
-      escapeCsvCell(tx.amount), 
+      escapeCsvCell(tx.amount),
       escapeCsvCell(tx.category),
       escapeCsvCell(tx.description),
       escapeCsvCell(new Date(tx.date).toISOString()),

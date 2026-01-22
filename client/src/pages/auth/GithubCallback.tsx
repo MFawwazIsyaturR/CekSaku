@@ -22,7 +22,12 @@ const GithubCallback = () => {
         .then((data) => {
           dispatch(setCredentials(data));
           toast.success("Masuk dengan GitHub berhasil");
-          navigate(PROTECTED_ROUTES.OVERVIEW, { replace: true });
+
+          const destination = data.user?.role === "admin"
+            ? PROTECTED_ROUTES.ADMIN_DASHBOARD
+            : PROTECTED_ROUTES.OVERVIEW;
+
+          navigate(destination, { replace: true });
         })
         .catch(() => {
           // toast.error("Gagal masuk dengan GitHub");

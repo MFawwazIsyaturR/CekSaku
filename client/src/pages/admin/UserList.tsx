@@ -10,14 +10,48 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useGetUsersQuery } from "@/features/user/userAPI";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import {
+    useGetUsersQuery,
+    useAdminUpdateUserMutation,
+    useAdminDeleteUserMutation
+} from "@/features/user/userAPI";
+import {
+    ChevronLeft,
+    ChevronRight,
+    Search,
+    MoreHorizontal,
+    UserCog,
+    Trash2,
+    Shield,
+    User as UserIcon
+} from "lucide-react";
 import { format } from "date-fns";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 const UserList = () => {
     const [page, setPage] = useState(1);
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
+    const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
     const { data, isLoading } = useGetUsersQuery({
         page,
@@ -25,13 +59,38 @@ const UserList = () => {
         search,
     });
 
-    const users = data?.data.users || [];
-    const totalPages = data?.data.pagination.totalPages || 1;
+    const [updateRole, { isLoading: isUpdating }] = useAdminUpdateUserMutation();
+    const [deleteUser, { isLoading: isDeleting }] = useAdminDeleteUserMutation();
+
+    const users = data?.data?.users || [];
+    const totalPages = data?.data?.pagination?.totalPages || 1;
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setSearch(searchInput);
         setPage(1);
+    };
+
+    const handleUpdateRole = async (id: string, currentRole: string) => {
+        const newRole = currentRole === "admin" ? "member" : "admin";
+        try {
+            await updateRole({ id, role: newRole }).unwrap();
+            toast.success(`User role updated to ${newRole}`);
+        } catch (error) {
+            toast.error("Failed to update user role");
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        if (!userToDelete) return;
+        try {
+            await deleteUser(userToDelete).unwrap();
+            toast.success("User deleted successfully");
+        } catch (error) {
+            toast.error("Failed to delete user");
+        } finally {
+            setUserToDelete(null);
+        }
     };
 
     return (
@@ -62,10 +121,10 @@ const UserList = () => {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
+                                    <TableHead>User</TableHead>
                                     <TableHead>Role</TableHead>
                                     <TableHead>Joined Date</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -84,11 +143,51 @@ const UserList = () => {
                                 ) : (
                                     users.map((user) => (
                                         <TableRow key={user._id}>
-                                            <TableCell>{user.name}</TableCell>
-                                            <TableCell>{user.email}</TableCell>
-                                            <TableCell className="capitalize">{user.role}</TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium">{user.name}</span>
+                                                    <span className="text-sm text-muted-foreground">{user.email}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={user.role === 'admin' ? "default" : "secondary"} className="capitalize">
+                                                    {user.role === 'admin' ? (
+                                                        <Shield className="mr-1 h-3 w-3" />
+                                                    ) : (
+                                                        <UserIcon className="mr-1 h-3 w-3" />
+                                                    )}
+                                                    {user.role}
+                                                </Badge>
+                                            </TableCell>
                                             <TableCell>
                                                 {format(new Date(user.createdAt), "PPP")}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem
+                                                            onClick={() => handleUpdateRole(user._id, user.role)}
+                                                            disabled={isUpdating}
+                                                        >
+                                                            <UserCog className="mr-2 h-4 w-4" />
+                                                            Make {user.role === 'admin' ? 'Member' : 'Admin'}
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            className="text-red-600 focus:text-red-600"
+                                                            onClick={() => setUserToDelete(user._id)}
+                                                        >
+                                                            <Trash2 className="mr-2 h-4 w-4" />
+                                                            Delete User
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -121,6 +220,28 @@ const UserList = () => {
                     </div>
                 </CardContent>
             </Card>
+
+            <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the user
+                            account and all their associated transactions from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteUser}
+                            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "Deleting..." : "Delete Account"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };
