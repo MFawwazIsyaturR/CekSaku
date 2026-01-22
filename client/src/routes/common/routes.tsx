@@ -18,6 +18,8 @@ import BillingPage from "@/pages/billing";
 import Payment from "@/pages/settings/payment";
 import AssetsPage from "@/pages/assets";
 import VerifyEmail from "@/pages/auth/_component/verify-email";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import UserList from "@/pages/admin/UserList";
 
 export const authenticationRoutePaths = [
   { path: AUTH_ROUTES.LANDING, element: <LandingPage /> },
@@ -31,12 +33,20 @@ export const authenticationRoutePaths = [
   { path: "/kontak", element: <ContactPage /> },
 ];
 
+import GlobalStats from "@/pages/admin/GlobalStats";
+
+export const adminRoutePaths = [
+  { path: PROTECTED_ROUTES.ADMIN_DASHBOARD, element: <AdminDashboard /> },
+  { path: PROTECTED_ROUTES.ADMIN_USERS, element: <UserList /> },
+  { path: PROTECTED_ROUTES.ADMIN_STATS, element: <GlobalStats /> },
+];
+
 export const protectedRoutePaths = [
   { path: PROTECTED_ROUTES.OVERVIEW, element: <Dashboard /> },
   { path: PROTECTED_ROUTES.TRANSACTIONS, element: <Transactions /> },
   { path: PROTECTED_ROUTES.REPORTS, element: <Reports /> },
   { path: PROTECTED_ROUTES.BILLING, element: <BillingPage /> },
-   { path: PROTECTED_ROUTES.ASSETS, element: <AssetsPage /> },
+  { path: PROTECTED_ROUTES.ASSETS, element: <AssetsPage /> },
   {
     path: PROTECTED_ROUTES.SETTINGS,
     element: <Settings />,

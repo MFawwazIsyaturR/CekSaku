@@ -15,6 +15,7 @@ export interface UserDocument extends Document {
   updatedAt: Date;
   comparePassword: (password: string) => Promise<boolean>;
   omitPassword: () => Omit<UserDocument, "password">;
+  role: "user" | "admin";
 }
 
 const userSchema = new Schema<UserDocument>(
@@ -67,6 +68,11 @@ userSchema.add({
   subscriptionExpiredAt: {
     type: Date,
     default: null,
+  },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
   },
 });
 

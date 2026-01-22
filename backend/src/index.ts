@@ -23,6 +23,7 @@ import { initializeMidtrans } from "./config/midtrans.config";
 import paymentRoutes from "./routes/payment.route";
 import assetRoutes from "./routes/asset.route";
 import budgetRoutes from "./routes/budget.route";
+import adminRoutes from "./routes/admin.route";
 
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
@@ -58,6 +59,7 @@ app.use(`${BASE_PATH}/analytics`, passportAuthenticateJwt, analyticsRoutes);
 app.use(`${BASE_PATH}/payment`, paymentRoutes);
 app.use(`${BASE_PATH}/asset`, passportAuthenticateJwt, assetRoutes);
 app.use(`${BASE_PATH}/budget`, passportAuthenticateJwt, budgetRoutes);
+app.use(`${BASE_PATH}/admin`, passportAuthenticateJwt, adminRoutes);
 
 app.use(errorHandler);
 

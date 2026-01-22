@@ -2,11 +2,14 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
   authenticationRoutePaths,
   protectedRoutePaths,
+  adminRoutePaths,
 } from "./common/routes";
 import AppLayout from "@/layouts/app-layout";
+import AdminLayout from "@/layouts/admin-layout";
 import BaseLayout from "@/layouts/base-layout";
 import AuthRoute from "./authRoute";
 import ProtectedRoute from "./protectedRoute";
+import AdminRoute from "./adminRoute";
 import useAuthExpiration from "@/hooks/use-auth-expiration";
 
 function AppRoutes() {
@@ -43,6 +46,19 @@ function AppRoutes() {
                   />
                 ))}
               </Route>
+            ))}
+          </Route>
+        </Route>
+
+        {/* Admin Routes with AdminLayout */}
+        <Route element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            {adminRoutePaths.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.element}
+              />
             ))}
           </Route>
         </Route>

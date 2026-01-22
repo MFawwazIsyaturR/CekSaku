@@ -17,6 +17,7 @@ interface User {
   subscriptionPlan?: string;
   subscriptionOrderId?: string;
   subscriptionExpiredAt?: string | Date | null;
+  role?: "user" | "admin";
 }
 
 interface ReportSetting {

@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+
 import {
   Settings,
   LayoutGrid,
@@ -14,8 +15,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import LogoutDialog from "../navbar/logout-dialog";
 
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+}
+
 interface SidebarProps {
   isSidebarOpen: boolean;
+  isAdmin?: boolean;
+  items?: NavItem[];
 }
 
 const topLevelNavItems = [
@@ -30,11 +39,16 @@ const bottomNavItems = [
   { label: "Pengaturan", href: "/settings", icon: Settings },
 ];
 
-function Sidebar({ isSidebarOpen }: SidebarProps) {
+function Sidebar({ isSidebarOpen, isAdmin = false, items }: SidebarProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const location = useLocation();
 
-  const isActive = (href: string) => location.pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === "/admin") {
+      return location.pathname === "/admin";
+    }
+    return location.pathname.startsWith(href);
+  };
 
   const NavLink = ({
     href,
@@ -49,7 +63,7 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
       to={href}
       className={cn(
         "group flex items-center rounded-lg py-3 text-muted-foreground transition-all duration-300 hover:text-primary relative overflow-hidden",
-        "px-3", 
+        "px-3",
         isActive(href) && "bg-muted text-primary"
       )}
     >
@@ -60,7 +74,7 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
           "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ml-3",
           isSidebarOpen
             ? "max-w-[200px] opacity-100"
-            : "max-w-0 opacity-0"         
+            : "max-w-0 opacity-0"
         )}
       >
         {label}
@@ -87,16 +101,46 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
         <Logo showText={isSidebarOpen} color="foreground" />
       </div>
 
+      {/* Admin Badge */}
+      {isAdmin && (
+        <div
+          className={cn(
+            "mx-2 px-3 py-2 rounded-lg bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20",
+            !isSidebarOpen && "px-2"
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
+            <span
+              className={cn(
+                "text-xs font-semibold text-violet-600 dark:text-violet-400 transition-all duration-300",
+                !isSidebarOpen && "hidden"
+              )}
+            >
+              Admin Panel
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* --- Menu Navigasi --- */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        <nav className="grid items-start px-2 gap-y-1">
-          {topLevelNavItems.map((item) => (
-            <NavLink key={item.href} {...item} />
-          ))}
+        <nav className="grid items-start px-2 gap-y-1 mt-2">
+          {items ? (
+            items.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))
+          ) : (
+            <>
+              {topLevelNavItems.map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
 
-          {bottomNavItems.map((item) => (
-            <NavLink key={item.href} {...item} />
-          ))}
+              {bottomNavItems.map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </>
+          )}
         </nav>
       </div>
 
@@ -113,12 +157,12 @@ function Sidebar({ isSidebarOpen }: SidebarProps) {
           )}
         >
           <LogOut className="h-5 w-5 shrink-0 transition-all duration-300" />
-          
+
           <span
             className={cn(
               "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ml-3",
-              isSidebarOpen 
-                ? "max-w-[200px] opacity-100" 
+              isSidebarOpen
+                ? "max-w-[200px] opacity-100"
                 : "max-w-0 opacity-0"
             )}
           >

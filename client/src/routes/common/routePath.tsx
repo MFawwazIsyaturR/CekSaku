@@ -1,24 +1,27 @@
 export const isAuthRoute = (pathname: string): boolean => {
-    return Object.values(AUTH_ROUTES).includes(pathname);
-  };
-  
-  export const AUTH_ROUTES = {
-    LANDING: "/",
-    SIGN_IN: "/login",
-    SIGN_UP: "/register",
-    VERIFY_EMAIL: "/verify-email",
-    FORGOT_PASSWORD: "/forgot-password",
-  };
-  
-  export const PROTECTED_ROUTES = {
-    OVERVIEW: "/dashboard",
-    TRANSACTIONS: "/transactions",
-    BILLING: "/billing",
-    REPORTS: "/reports",
-    ASSETS: "/assets",
-    SETTINGS: "/settings",
-    SETTINGS_APPEARANCE: "/settings/appearance",
-    SETTINGS_BILLING: "/settings/billing",
-    SETTINGS_SECURITY: "/settings/security",
-    SETTINGS_PAYMENT: "/settings/pembayaran",
-  };
+  return Object.values(AUTH_ROUTES).includes(pathname);
+};
+
+export const AUTH_ROUTES = {
+  LANDING: "/",
+  SIGN_IN: "/login",
+  SIGN_UP: "/register",
+  VERIFY_EMAIL: "/verify-email",
+  FORGOT_PASSWORD: "/forgot-password",
+};
+
+export const PROTECTED_ROUTES = {
+  OVERVIEW: "/dashboard",
+  TRANSACTIONS: "/transactions",
+  BILLING: "/billing",
+  REPORTS: "/reports",
+  ASSETS: "/assets",
+  SETTINGS: "/settings",
+  SETTINGS_APPEARANCE: "/settings/appearance",
+  SETTINGS_BILLING: "/settings/billing",
+  SETTINGS_SECURITY: "/settings/security",
+  SETTINGS_PAYMENT: "/settings/pembayaran",
+  ADMIN_DASHBOARD: "/admin",
+  ADMIN_USERS: "/admin/users",
+  ADMIN_STATS: "/admin/stats",
+};
