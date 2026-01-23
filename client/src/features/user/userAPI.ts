@@ -56,6 +56,33 @@ export interface AdminTransaction {
   createdAt: string;
 }
 
+export interface PaymentLog {
+  _id: string;
+  userId: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  orderId: string;
+  amount: number;
+  plan: string;
+  status: 'BELUM DIBAYAR' | 'PROSES' | 'SUKSES';
+  paymentType?: string;
+  createdAt: string;
+}
+
+export interface GetPaymentLogsResponse {
+  data: {
+    paymentLogs: PaymentLog[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  };
+}
+
 export interface GetTransactionsResponse {
   data: {
     transactions: AdminTransaction[];
@@ -156,6 +183,22 @@ export const userApi = apiClient.injectEndpoints({
       }),
       invalidatesTags: ['transactions' as any],
     }),
+    getAdminPaymentLogs: builder.query<GetPaymentLogsResponse, { page: number; limit: number; search: string }>({
+      query: (params) => ({
+        url: "/admin/payments",
+        method: "GET",
+        params,
+      }),
+      providesTags: ['payments' as any],
+    }),
+    adminUpdatePaymentStatus: builder.mutation<void, { id: string; status: string }>({
+      query: ({ id, status }) => ({
+        url: `/admin/payments/${id}`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: ['payments' as any],
+    }),
   }),
 });
 
@@ -170,5 +213,7 @@ export const {
   useAdminDeleteUserMutation,
   useGetAdminAllTransactionsQuery,
   useGetUserTransactionsQuery,
-  useAdminDeleteTransactionMutation
+  useAdminDeleteTransactionMutation,
+  useGetAdminPaymentLogsQuery,
+  useAdminUpdatePaymentStatusMutation
 } = userApi;
