@@ -12,6 +12,7 @@ export interface UpdateUserParams {
   subscriptionPlan?: string;
   subscriptionOrderId?: string;
   subscriptionExpiredAt?: Date;
+  subscriptionPaymentType?: string;
   name?: string;
 }
 
@@ -53,6 +54,7 @@ export const updateUser = async (
     subscriptionPlan: updateData.subscriptionPlan || user.subscriptionPlan,
     subscriptionOrderId: updateData.subscriptionOrderId || user.subscriptionOrderId,
     subscriptionExpiredAt: updateData.subscriptionExpiredAt || user.subscriptionExpiredAt,
+    subscriptionPaymentType: updateData.subscriptionPaymentType || user.subscriptionPaymentType,
     name: updateData.name || user.name,
   });
 
