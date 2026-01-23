@@ -29,4 +29,5 @@ export const PROTECTED_ROUTES = {
   ADMIN_SETTINGS_APPEARANCE: "/admin/settings/appearance",
   ADMIN_SETTINGS_SECURITY: "/admin/settings/security",
   ADMIN_SETTINGS_PAYMENT: "/admin/settings/pembayaran",
+  ADMIN_PAYMENTS: "/admin/payments",
 };

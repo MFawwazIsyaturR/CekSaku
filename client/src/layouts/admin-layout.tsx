@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Users, TrendingUp, ReceiptText, Settings } from "lucide-react";
+import { LayoutGrid, Users, TrendingUp, ReceiptText, Settings, CreditCard } from "lucide-react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
 
@@ -10,6 +10,7 @@ const adminNavItems = [
     { label: "Daftar Pengguna", href: "/admin/users", icon: Users },
     { label: "Statistik Global", href: "/admin/stats", icon: TrendingUp },
     { label: "Audit Transaksi", href: "/admin/transactions", icon: ReceiptText },
+    { label: "Kelola Pembayaran", href: "/admin/payments", icon: CreditCard },
     { label: "Pengaturan", href: "/admin/settings", icon: Settings },
 ];
 
