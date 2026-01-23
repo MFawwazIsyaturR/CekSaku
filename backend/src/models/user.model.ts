@@ -10,6 +10,7 @@ export interface UserDocument extends Document {
   subscriptionPlan: string;
   subscriptionOrderId: string;
   subscriptionExpiredAt: Date;
+  subscriptionPaymentType?: string;
   isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -67,6 +68,10 @@ userSchema.add({
   },
   subscriptionExpiredAt: {
     type: Date,
+    default: null,
+  },
+  subscriptionPaymentType: {
+    type: String,
     default: null,
   },
   role: {
