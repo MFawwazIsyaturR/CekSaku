@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Check, X } from "lucide-react";
 import React, { useState } from "react";
 import { useAppDispatch, useTypedSelector } from "@/app/hook";
-import { useCreateSubscriptionPaymentMutation } from "@/features/payment/paymentAPI";
+import { useCreateSubscriptionPaymentMutation, useCancelSubscriptionMutation } from "@/features/payment/paymentAPI";
 import { updateCredentials } from "@/features/auth/authSlice";
 
 /* =========================================================
@@ -136,7 +136,7 @@ function BillingPage() {
   const dispatch = useAppDispatch();
   const { user } = useTypedSelector((state) => state.auth);
 
-  const [createSubscriptionPayment, { isLoading: isCreatingPayment }] = useCreateSubscriptionPaymentMutation();
+  const [createSubscriptionPayment] = useCreateSubscriptionPaymentMutation();
 
   // Fungsi toggle antara Bulanan ↔ Tahunan
   const toggleBilling = () => setIsYearly(!isYearly);
@@ -154,10 +154,9 @@ function BillingPage() {
       }
 
       // Calculate the actual price based on billing cycle (monthly vs yearly)
-      const price = isYearly 
-        ? (plan.yearlyPrice || plan.price * 12) 
+      const price = isYearly
+        ? (plan.yearlyPrice || plan.price * 12)
         : plan.price;
-      const period = isYearly ? 'tahun' : 'bulan';
       const planName = `${plan.name} Plan ${isYearly ? '(Tahunan)' : '(Bulanan)'}`;
 
       // Validate that required fields are not empty/null
@@ -190,7 +189,7 @@ function BillingPage() {
       script.onload = () => {
         // @ts-ignore
         window.snap.pay(token, {
-          onSuccess: function(result: any) {
+          onSuccess: function (result: any) {
             console.log('Payment success:', result);
             alert('Payment successful!');
             // Update the user's subscription status in the store
@@ -206,17 +205,17 @@ function BillingPage() {
             }
             setIsLoading(false);
           },
-          onPending: function(result: any) {
+          onPending: function (result: any) {
             console.log('Payment pending:', result);
             alert('Payment pending, please complete the transaction');
             setIsLoading(false);
           },
-          onError: function(result: any) {
+          onError: function (result: any) {
             console.log('Payment error:', result);
             alert('Payment failed, please try again');
             setIsLoading(false);
           },
-          onClose: function() {
+          onClose: function () {
             console.log('Customer closed the popup');
             setIsLoading(false);
           }
@@ -232,10 +231,34 @@ function BillingPage() {
     }
   };
 
-  const handleDowngrade = () => {
-    // In this implementation, the free tier is automatic
-    // In a real-world scenario, you might want to have actual downgrade functionality
-    alert("You are already on the free plan.");
+  const [cancelSubscription] = useCancelSubscriptionMutation();
+  const handleDowngrade = async () => {
+    if (!user?.subscriptionOrderId) {
+      alert("Anda sudah berada di paket Gratis.");
+      return;
+    }
+
+    if (!confirm("Apakah Anda yakin ingin membatalkan langganan Pro?")) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await cancelSubscription({ orderId: user.subscriptionOrderId }).unwrap();
+      dispatch(updateCredentials({
+        user: {
+          ...user,
+          subscriptionStatus: 'cancelled',
+          subscriptionPlan: 'free'
+        }
+      }));
+      alert("Langganan berhasil dibatalkan.");
+    } catch (err) {
+      console.error('Cancellation error:', err);
+      setError('Gagal membatalkan langganan. Silakan coba lagi.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -280,80 +303,81 @@ function BillingPage() {
             const isCurrentPlan = isCurrentProPlan || isCurrentFreePlan;
 
             return (
-            <Card
-              key={plan.name}
-              className={cn("flex flex-col", {
-                "border-2 border-primary shadow-lg": plan.isMostPopular,
-              })}
-            >
-              {/* ===== HEADER KARTU PLAN ===== */}
-              <CardHeader className="relative">
-                {plan.isMostPopular && (
-                  <Badge className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    Paling Populer
-                  </Badge>
-                )}
-                <CardTitle>{plan.name}</CardTitle>
-                <CardDescription>
-                  <span className="text-3xl font-bold">
-                    {isYearly
-                      ? `Rp${(plan.yearlyPrice || plan.price * 12).toLocaleString("id-ID")}`
-                      : `Rp${plan.price.toLocaleString("id-ID")}`}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {plan.price > 0 ? (isYearly ? "/tahun" : "/bulan") : ""}
-                  </span>
-                </CardDescription>
-              </CardHeader>
-
-              {/* ===== DAFTAR FITUR PLAN ===== */}
-              <CardContent className="flex-1">
-                <ul className="space-y-2">
-                  {plan.features.map((feature) => (
-                    <PlanFeature key={feature.text} {...feature} />
-                  ))}
-
-                  {/* Fitur tidak tersedia di Free plan */}
-                  {plan.name === "Gratis" &&
-                    features
-                      .slice(4)
-                      .map((feature) => (
-                        <PlanFeature
-                          key={feature.text}
-                          {...feature}
-                          negative
-                        />
-                      ))}
-                </ul>
-              </CardContent>
-
-              {/* ===== TOMBOL ACTION ===== */}
-              <CardFooter>
-                <Button
-                  className="w-full"
-                  disabled={isCurrentPlan || isLoading || (plan.name === "Pro" && !user?.id)}
-                  variant={plan.isMostPopular ? "default" : "outline"}
-                  onClick={plan.name === "Pro" ? () => handlePayment(plan) : 
-                           plan.name === "Gratis" ? () => handleDowngrade() : undefined}
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      {isCurrentPlan
-                        ? "Paket Saat Ini"
-                        : plan.name === "Gratis"
-                        ? "Downgrade"
-                        : "Upgrade ke Pro"}
-                    </>
+              <Card
+                key={plan.name}
+                className={cn("flex flex-col", {
+                  "border-2 border-primary shadow-lg": plan.isMostPopular,
+                })}
+              >
+                {/* ===== HEADER KARTU PLAN ===== */}
+                <CardHeader className="relative">
+                  {plan.isMostPopular && (
+                    <Badge className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      Paling Populer
+                    </Badge>
                   )}
-                </Button>
-              </CardFooter>
-            </Card>
-          )})}
+                  <CardTitle>{plan.name}</CardTitle>
+                  <CardDescription>
+                    <span className="text-3xl font-bold">
+                      {isYearly
+                        ? `Rp${(plan.yearlyPrice || plan.price * 12).toLocaleString("id-ID")}`
+                        : `Rp${plan.price.toLocaleString("id-ID")}`}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {plan.price > 0 ? (isYearly ? "/tahun" : "/bulan") : ""}
+                    </span>
+                  </CardDescription>
+                </CardHeader>
+
+                {/* ===== DAFTAR FITUR PLAN ===== */}
+                <CardContent className="flex-1">
+                  <ul className="space-y-2">
+                    {plan.features.map((feature) => (
+                      <PlanFeature key={feature.text} {...feature} />
+                    ))}
+
+                    {/* Fitur tidak tersedia di Free plan */}
+                    {plan.name === "Gratis" &&
+                      features
+                        .slice(4)
+                        .map((feature) => (
+                          <PlanFeature
+                            key={feature.text}
+                            {...feature}
+                            negative
+                          />
+                        ))}
+                  </ul>
+                </CardContent>
+
+                {/* ===== TOMBOL ACTION ===== */}
+                <CardFooter>
+                  <Button
+                    className="w-full"
+                    disabled={isCurrentPlan || isLoading}
+                    variant={plan.isMostPopular ? "default" : "outline"}
+                    onClick={plan.name === "Pro" ? () => handlePayment(plan) :
+                      plan.name === "Gratis" ? () => handleDowngrade() : undefined}
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        {isCurrentPlan
+                          ? "Paket Saat Ini"
+                          : plan.name === "Gratis"
+                            ? "Downgrade"
+                            : "Upgrade ke Pro"}
+                      </>
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+            )
+          })}
         </div>
 
         {error && (
@@ -362,12 +386,6 @@ function BillingPage() {
           </div>
         )}
 
-        {/* Show a message if user is not authenticated */}
-        {!user?.id && plans.some(p => p.name === "Pro") && (
-          <div className="mt-4 p-4 text-center bg-yellow-50 border border-yellow-200 rounded-md">
-            <p className="text-yellow-800">Fitur baru akan segera hadir! Saat ini, semua paket kami tersedia secara gratis</p>
-          </div>
-        )}
       </div>
     </PageLayout>
   );

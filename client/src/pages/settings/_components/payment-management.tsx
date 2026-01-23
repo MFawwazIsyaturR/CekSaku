@@ -28,6 +28,7 @@ export default function PaymentManagement() {
         user: {
           ...user,
           subscriptionStatus: 'cancelled',
+          subscriptionPlan: 'free',
           subscriptionOrderId: user.subscriptionOrderId
         }
       }));
@@ -46,6 +47,35 @@ export default function PaymentManagement() {
   const isExpired = user?.subscriptionStatus === 'expired' || (user?.subscriptionExpiredAt && new Date(user.subscriptionExpiredAt) < new Date());
   const isPending = user?.subscriptionStatus === 'pending';
 
+  // Map Midtrans payment_type to readable names
+  const getPaymentMethodName = (type?: string) => {
+    if (!type) return "Tidak diketahui";
+
+    // Handle granular bank transfers
+    if (type.startsWith("bank_transfer:")) {
+      const bank = type.split(":")[1].toUpperCase();
+      return `Transfer Bank (${bank})`;
+    }
+
+    const methods: Record<string, string> = {
+      credit_card: "Kartu Kredit/Debit",
+      gopay: "GoPay",
+      shopeepay: "ShopeePay",
+      bank_transfer: "Bank Transfer",
+      echannel: "Mandiri Bill Payment",
+      bca_klikpay: "BCA KlikPay",
+      bripay: "BRImo",
+      cimb_clicks: "CIMB Clicks",
+      danamon_online: "Danamon Online Banking",
+      qris: "QRIS",
+      akulaku: "Akulaku",
+      kredivo: "Kredivo",
+      indomaret: "Indomaret",
+      alfamart: "Alfamart",
+    };
+    return methods[type] || type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, " ");
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -55,7 +85,7 @@ export default function PaymentManagement() {
         </p>
       </div>
       <Separator />
-      
+
       <Card>
         <CardHeader className="grid grid-cols-2 gap-4">
           <div>
@@ -67,7 +97,7 @@ export default function PaymentManagement() {
           <div className="flex flex-col justify-center items-end">
             <div>
               <h4 className="font-semibold">
-                {isSubscribed ? "Langganan Pro Aktif" : isCancelled ? "Langganan Dibatalkan" : isExpired ? "Langganan Kadaluarsa" : "Tidak Berlangganan"}
+                {isSubscribed ? "Langganan Pro Aktif" : isPending ? "Menunggu Pembayaran" : isCancelled ? "Langganan Dibatalkan" : isExpired ? "Langganan Kadaluarsa" : "Tidak Berlangganan"}
               </h4>
               <p className="text-sm text-muted-foreground">
                 {user?.subscriptionPlan || "Gratis"}
@@ -78,42 +108,45 @@ export default function PaymentManagement() {
                 </p>
               )}
             </div>
-            <Badge 
+            <Badge
               variant={
-                isSubscribed ? "default" : 
-                isCancelled ? "secondary" : 
-                isExpired ? "destructive" : 
-                "outline"
+                isSubscribed ? "default" :
+                  isPending ? "outline" :
+                    isCancelled ? "secondary" :
+                      isExpired ? "destructive" :
+                        "secondary"
               }
             >
-              {isSubscribed ? "Aktif" : isCancelled ? "Dibatalkan" : isExpired ? "Kadaluarsa" : "Gratis"}
+              {isSubscribed ? "Aktif" : isPending ? "Menunggu" : isCancelled ? "Dibatalkan" : isExpired ? "Kadaluarsa" : "Gratis"}
             </Badge>
           </div>
         </CardHeader>
-        
+
         <CardContent>
           <div className="grid gap-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Metode Pembayaran:</span>
-              <span className="text-sm text-muted-foreground">•••• •••• •••• 4242</span>
+              <span className="text-sm text-muted-foreground">
+                {(isSubscribed || isPending) ? getPaymentMethodName(user?.subscriptionPaymentType) : "-"}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Tanggal Pembayaran Berikutnya:</span>
               <span className="text-sm text-muted-foreground">
-                {user?.subscriptionExpiredAt ? new Date(user?.subscriptionExpiredAt).toLocaleDateString("id-ID") : "-"}
+                {isSubscribed && user?.subscriptionExpiredAt ? new Date(user?.subscriptionExpiredAt).toLocaleDateString("id-ID") : "-"}
               </span>
             </div>
             <div className="flex items-center justify-between mt-2">
-              <span className="text-sm font-medium">Jenis Pembayaran:</span>
-              <span className="text-sm text-muted-foreground">Tahunan</span>
+              <span className="text-sm font-medium">Paket:</span>
+              <span className="text-sm text-muted-foreground">{user?.subscriptionPlan || "Gratis"}</span>
             </div>
           </div>
         </CardContent>
-        
+
         <CardFooter className="flex flex-col items-start gap-4">
-          {isSubscribed && (
-            <Button 
-              variant="destructive" 
+          {(isSubscribed || isPending) && (
+            <Button
+              variant="destructive"
               onClick={handleCancelSubscription}
               disabled={isCancelling || isCancellingApi}
             >
@@ -128,30 +161,47 @@ export default function PaymentManagement() {
         </CardFooter>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Metode Pembayaran</CardTitle>
-          <CardDescription>
-            Metode pembayaran yang digunakan untuk pembayaran otomatis
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-            <div>
-              <p className="font-medium">Kartu Visa</p>
-              <p className="text-sm text-muted-foreground">•••• •••• •••• 4242</p>
-              <p className="text-sm text-muted-foreground">Berlaku hingga 12/2027</p>
-            </div>
-          </div>
-          <Button variant="outline">Kelola</Button>
-        </CardContent>
-        <CardFooter>
-          <Button variant="outline" className="w-full">
-            + Tambahkan Metode Pembayaran Baru
-          </Button>
-        </CardFooter>
-      </Card>
+      {!(isSubscribed || isPending) && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="text-primary">Buka Potensi Penuh dengan Pro</CardTitle>
+            <CardDescription>
+              Nikmati fitur tak terbatas, analitik lanjutan, dan dukungan prioritas.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="grid grid-cols-2 gap-2 text-sm">
+              <li className="flex items-center gap-2">
+                <Badge variant="secondary" className="h-5 w-5 rounded-full p-0 flex items-center justify-center">✓</Badge>
+                Transaksi Tak Terbatas
+              </li>
+              <li className="flex items-center gap-2">
+                <Badge variant="secondary" className="h-5 w-5 rounded-full p-0 flex items-center justify-center">✓</Badge>
+                Analitik Lanjutan
+              </li>
+              <li className="flex items-center gap-2">
+                <Badge variant="secondary" className="h-5 w-5 rounded-full p-0 flex items-center justify-center">✓</Badge>
+                Laporan PDF & Excel
+              </li>
+              <li className="flex items-center gap-2">
+                <Badge variant="secondary" className="h-5 w-5 rounded-full p-0 flex items-center justify-center">✓</Badge>
+                Dukungan Prioritas
+              </li>
+            </ul>
+          </CardContent>
+          <CardFooter>
+            <Button onClick={() => window.location.href = "/billing"} className="w-full">
+              Upgrade ke Pro Sekarang
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
+
+      {isPending && (
+        <Badge variant="outline" className="mb-4">
+          Pembayaran Sedang Diproses
+        </Badge>
+      )}
     </div>
   );
 }
