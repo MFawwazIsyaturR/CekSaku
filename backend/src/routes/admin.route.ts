@@ -7,6 +7,8 @@ import {
     getAllTransactions,
     getUserTransactions,
     adminDeleteTransaction,
+    getAllPaymentLogs,
+    updatePaymentStatus,
 } from "../controllers/admin.controller";
 import { roleMiddleware } from "../middlewares/role.middleware";
 
@@ -23,5 +25,8 @@ adminRoutes.get("/stats", getGlobalStats);
 adminRoutes.get("/transactions", getAllTransactions); // Audit all
 adminRoutes.delete("/transactions/:id", adminDeleteTransaction); // Delete transaction
 adminRoutes.get("/users/:id/transactions", getUserTransactions); // Specific user
+
+adminRoutes.get("/payments", getAllPaymentLogs);
+adminRoutes.put("/payments/:id", updatePaymentStatus);
 
 export default adminRoutes;
