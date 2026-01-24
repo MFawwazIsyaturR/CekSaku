@@ -25,6 +25,7 @@ import {
     XAxis,
     YAxis,
     CartesianGrid,
+    ResponsiveContainer,
 } from "recharts";
 import {
     ChartConfig,
@@ -38,11 +39,11 @@ import { format } from "date-fns";
 import { useGetAdminStatsQuery } from "@/features/user/userAPI";
 import { formatCurrency } from "@/lib/format-currency";
 import { cn } from "@/lib/utils";
+import CountUp from "react-countup";
 
 const AdminDashboard = () => {
     const [range, setRange] = useState("7d");
 
-    // Fetch stats with range
     const { data: statsData, isLoading: statsLoading } = useGetAdminStatsQuery(range);
     const stats = statsData?.data || {
         totalUsers: 0,
@@ -67,119 +68,99 @@ const AdminDashboard = () => {
         },
     } satisfies ChartConfig;
 
-    // Stats cards data
     const statsCards = [
         {
             title: "Total Pengguna",
-            value: statsLoading ? "..." : stats.totalUsers.toLocaleString(),
+            value: stats.totalUsers,
             description: "Pengguna terdaftar",
             icon: Users,
             trend: `${stats.trends.users > 0 ? "+" : ""}${stats.trends.users}%`,
             trendUp: stats.trends.users >= 0,
-            gradient: "from-blue-500 to-cyan-500",
-            bgGradient: "from-blue-500/10 to-cyan-500/10",
+            type: "users",
         },
         {
             title: "Total Transaksi",
-            value: statsLoading ? "..." : stats.totalTransactions.toLocaleString(),
+            value: stats.totalTransactions,
             description: "Transaksi tercatat",
             icon: Activity,
             trend: `${stats.trends.transactions > 0 ? "+" : ""}${stats.trends.transactions}%`,
             trendUp: stats.trends.transactions >= 0,
-            gradient: "from-violet-500 to-purple-500",
-            bgGradient: "from-violet-500/10 to-purple-500/10",
+            type: "transactions",
         },
         {
             title: "Volume Transaksi",
-            value: statsLoading ? "..." : formatCurrency(stats.totalTransactionAmount),
+            value: stats.totalTransactionAmount,
             description: "Total nilai transaksi",
             icon: DollarSign,
             trend: `${stats.trends.volume > 0 ? "+" : ""}${stats.trends.volume}%`,
             trendUp: stats.trends.volume >= 0,
-            gradient: "from-emerald-500 to-green-500",
-            bgGradient: "from-emerald-500/10 to-green-500/10",
-        },
-        {
-            title: "Rata-rata Transaksi",
-            value: statsLoading ? "..." : formatCurrency(
-                stats.totalTransactions > 0
-                    ? stats.totalTransactionAmount / stats.totalTransactions
-                    : 0
-            ),
-            description: "Per transaksi",
-            icon: TrendingUp,
-            trend: "+0%",
-            trendUp: true,
-            gradient: "from-orange-500 to-amber-500",
-            bgGradient: "from-orange-500/10 to-amber-500/10",
+            type: "currency",
         },
     ];
 
     return (
-        <div className="space-y-8">
+        <div className="p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-3xl font-bold tracking-tight">Dashboard Admin</h1>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-white">
+                        Dashboard Admin
+                    </h1>
                     <p className="text-muted-foreground">
                         Ringkasan statistik keseluruhan sistem CekSaku
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <Select value={range} onValueChange={setRange}>
-                        <SelectTrigger className="w-[180px] bg-background">
-                            <SelectValue placeholder="Pilih rentang" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="7d">7 Hari Terakhir</SelectItem>
-                            <SelectItem value="30d">30 Hari Terakhir</SelectItem>
-                            <SelectItem value="90d">90 Hari Terakhir</SelectItem>
-                            <SelectItem value="12m">12 Bulan Terakhir</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-border rounded-lg shadow-sm font-medium text-sm">
+                        <Calendar className="h-4 w-4 text-primary" />
+                        <span className="hidden sm:inline">Periode:</span>
+                        <Select value={range} onValueChange={setRange}>
+                            <SelectTrigger className="w-[140px] border-none bg-transparent h-auto p-0 focus:ring-0 font-bold">
+                                <SelectValue placeholder="Pilih rentang" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl border-border">
+                                <SelectItem value="7d">7 Hari</SelectItem>
+                                <SelectItem value="30d">30 Hari</SelectItem>
+                                <SelectItem value="90d">90 Hari</SelectItem>
+                                <SelectItem value="12m">12 Bulan</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </div>
 
-            {/* Stats Cards Grid */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Stats Cards Grid - Glassmorphism Style */}
+            <div className="grid gap-6 md:grid-cols-3">
                 {statsCards.map((stat, index) => (
-                    <Card key={index} className="relative overflow-hidden border-0 shadow-lg">
-                        <div className={cn(
-                            "absolute inset-0 bg-gradient-to-br opacity-50",
-                            stat.bgGradient
-                        )} />
-                        <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
+                    <Card key={index} className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md shadow-lg rounded-xl border border-white/20 dark:border-gray-700/40 transition-all hover:scale-[1.02]">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                                 {stat.title}
                             </CardTitle>
-                            <div className={cn(
-                                "rounded-lg p-2 bg-gradient-to-br",
-                                stat.gradient
-                            )}>
-                                <stat.icon className="h-4 w-4 text-white" />
+                            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                <stat.icon className="h-5 w-5" />
                             </div>
                         </CardHeader>
-                        <CardContent className="relative">
-                            <div className="text-2xl font-bold">{stat.value}</div>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                {statsLoading ? "..." : (
+                                    <CountUp
+                                        end={stat.value}
+                                        prefix={stat.type === "currency" ? "Rp" : ""}
+                                        separator="."
+                                        duration={1.5}
+                                    />
+                                )}
+                            </div>
                             <div className="flex items-center gap-2 mt-1">
-                                <Badge
-                                    variant="secondary"
-                                    className={cn(
-                                        "text-xs",
-                                        stat.trendUp
-                                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                                    )}
-                                >
-                                    {stat.trendUp ? (
-                                        <ArrowUpRight className="h-3 w-3 mr-1" />
-                                    ) : (
-                                        <ArrowDownRight className="h-3 w-3 mr-1" />
-                                    )}
+                                <span className={cn(
+                                    "flex items-center text-xs font-bold",
+                                    stat.trendUp ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                                )}>
+                                    {stat.trendUp ? <ArrowUpRight className="h-3 w-3 mr-1" /> : <ArrowDownRight className="h-3 w-3 mr-1" />}
                                     {stat.trend}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
+                                </span>
+                                <span className="text-xs text-muted-foreground whitespace-nowrap">
                                     {stat.description}
                                 </span>
                             </div>
@@ -188,77 +169,51 @@ const AdminDashboard = () => {
                 ))}
             </div>
 
-            {/* Growth Chart */}
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-background to-muted/20">
-                <CardHeader>
+            {/* Main Chart Section */}
+            <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md shadow-lg rounded-xl border border-white/20 dark:border-gray-700/40">
+                <CardHeader className="border-b border-white/20 dark:border-gray-700/40">
                     <CardTitle className="text-lg font-bold">Pertumbuhan Volume Transaksi</CardTitle>
-                    <CardDescription>Visualisasi aktivitas transaksi dalam rentang waktu terpilih</CardDescription>
+                    <CardDescription>Visualisasi aktivitas ekonomi dalam rentang waktu terpilih</CardDescription>
                 </CardHeader>
-                <CardContent className="px-2 pt-2 sm:px-6 sm:pt-2 h-[350px]">
-                    <ChartContainer
-                        config={chartConfig}
-                        className="aspect-auto h-[350px] w-full"
-                    >
-                        <AreaChart
-                            data={stats.growthData}
-                            margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                        >
+                <CardContent className="p-6">
+                    <ChartContainer config={chartConfig} className="h-[350px] w-full">
+                        <AreaChart data={stats.growthData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
                                     <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis
                                 dataKey="date"
                                 axisLine={false}
                                 tickLine={false}
-                                tickMargin={8}
+                                tickMargin={12}
                                 tickFormatter={(value) => {
                                     try {
                                         const date = new Date(value);
-                                        if (range === "12m") {
-                                            return format(date, "MMM");
-                                        }
-                                        return format(date, "d MMM");
-                                    } catch (e) {
-                                        return value;
-                                    }
+                                        return format(date, range === "12m" ? "MMM" : "d MMM");
+                                    } catch (e) { return value; }
                                 }}
                             />
                             <YAxis
                                 axisLine={false}
                                 tickLine={false}
-                                tickMargin={8}
+                                tickMargin={12}
                                 tickFormatter={(value) => `Rp${(value / 1000).toLocaleString()}k`}
                             />
                             <ChartTooltip
-                                cursor={true}
-                                content={
-                                    <ChartTooltipContent
-                                        labelFormatter={(value) => {
-                                            try {
-                                                return format(new Date(value), "EEEE, d MMMM yyyy");
-                                            } catch (e) {
-                                                return value;
-                                            }
-                                        }}
-                                        indicator="line"
-                                        formatter={(value, name) => [
-                                            <span key={name} className="font-medium">
-                                                {formatCurrency(Number(value))}
-                                            </span>,
-                                            chartConfig[name as keyof typeof chartConfig]?.label || name
-                                        ]}
-                                    />
-                                }
+                                cursor={{ stroke: 'rgba(0,0,0,0.1)', strokeWidth: 2 }}
+                                content={<ChartTooltipContent
+                                    labelFormatter={(val) => format(new Date(val), "EEEE, d MMMM yyyy")}
+                                    indicator="dot"
+                                />}
                             />
                             <Area
                                 type="monotone"
                                 dataKey="volume"
                                 stroke="hsl(var(--primary))"
-                                strokeWidth={2}
+                                strokeWidth={3}
                                 fillOpacity={1}
                                 fill="url(#colorVolume)"
                             />
@@ -268,76 +223,42 @@ const AdminDashboard = () => {
                 </CardContent>
             </Card>
 
-            {/* Quick Stats Row */}
-            <div className="grid gap-4 md:grid-cols-3">
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-violet-500/5 to-purple-500/5">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <UserCheck className="h-4 w-4 text-violet-500" />
-                            Pengguna Aktif
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{statsLoading ? "..." : stats.activeUsers.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {stats.totalUsers > 0
-                                ? `${Math.round((stats.activeUsers / stats.totalUsers) * 100)}% dari total pengguna aktif (30 hari terakhir)`
-                                : "0% dari total pengguna"}
-                        </p>
-                        <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                                className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all"
-                                style={{ width: `${stats.totalUsers > 0 ? (stats.activeUsers / stats.totalUsers) * 100 : 0}%` }}
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500/5 to-cyan-500/5">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <ShieldCheck className="h-4 w-4 text-blue-500" />
-                            Admin
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{statsLoading ? "..." : stats.adminCount.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {stats.totalUsers > 0
-                                ? `${((stats.adminCount / stats.totalUsers) * 100).toFixed(1)}% dari total pengguna`
-                                : "0% dari total pengguna"}
-                        </p>
-                        <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                                className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all"
-                                style={{ width: `${stats.totalUsers > 0 ? (stats.adminCount / stats.totalUsers) * 100 : 0}%` }}
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-500/5 to-green-500/5">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <Activity className="h-4 w-4 text-emerald-500" />
-                            Transaksi Hari Ini
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{statsLoading ? "..." : stats.todayTransactions.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {stats.totalTransactions > 0
-                                ? `${((stats.todayTransactions / stats.totalTransactions) * 100).toFixed(1)}% dari total transaksi`
-                                : "Baru hari ini"}
-                        </p>
-                        <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                                className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full transition-all"
-                                style={{ width: `${stats.totalTransactions > 0 ? (stats.todayTransactions / stats.totalTransactions) * 100 : 0}%` }}
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
+            {/* Quick Stats Row - Glassy Detail Badges */}
+            <div className="grid gap-6 md:grid-cols-3">
+                {[
+                    { label: "Pengguna Aktif", value: stats.activeUsers, icon: UserCheck, color: "text-violet-500", bg: "bg-violet-500/10", percent: (stats.activeUsers / stats.totalUsers) * 100 },
+                    { label: "Admin Sistem", value: stats.adminCount, icon: ShieldCheck, color: "text-blue-500", bg: "bg-blue-500/10", percent: (stats.adminCount / stats.totalUsers) * 100 },
+                    { label: "Transaksi Hari Ini", value: stats.todayTransactions, icon: Activity, color: "text-emerald-500", bg: "bg-emerald-500/10", percent: (stats.todayTransactions / stats.totalTransactions) * 100 },
+                ].map((item, idx) => (
+                    <Card key={idx} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm border-none shadow-sm rounded-xl overflow-hidden">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4">
+                                <div className={cn("p-3 rounded-xl", item.bg)}>
+                                    <item.icon className={cn("h-6 w-6", item.color)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-sm font-medium text-muted-foreground">{item.label}</p>
+                                    <div className="flex items-baseline gap-2">
+                                        <h4 className="text-2xl font-bold">{statsLoading ? "..." : item.value.toLocaleString()}</h4>
+                                        <span className="text-[10px] font-black tracking-widest uppercase opacity-40">Static</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="flex justify-between text-[10px] font-bold uppercase tracking-tighter text-muted-foreground">
+                                    <span>Rasio</span>
+                                    <span>{Math.round(item.percent || 0)}%</span>
+                                </div>
+                                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                                    <div
+                                        className={cn("h-full rounded-full transition-all duration-1000", item.color.replace('text-', 'bg-'))}
+                                        style={{ width: `${item.percent || 0}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         </div>
     );
