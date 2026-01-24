@@ -1,57 +1,33 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Check, X } from "lucide-react";
+import { Check, X, Loader2, ArrowRight } from "lucide-react";
 import React, { useState } from "react";
 import { useAppDispatch, useTypedSelector } from "@/app/hook";
 import { useCreateSubscriptionPaymentMutation, useCancelSubscriptionMutation } from "@/features/payment/paymentAPI";
 import { updateCredentials } from "@/features/auth/authSlice";
 
 /* =========================================================
-   ============= PENGGANTI UNTUK KOMPONEN LAYOUT ==========
-   =========================================================
-   Komponen PageLayout dan PageHeader bersifat sementara
-   sebagai pengganti jika versi asli belum tersedia.
-   Fungsinya untuk membungkus halaman dan menampilkan judul.
-*/
-
-// Layout sederhana agar konten berada di tengah
-const PageLayout = ({ children }: { children: React.ReactNode }) => (
-  <div className="container mx-auto py-8 px-4">{children}</div>
-);
-
-// Header sederhana untuk menampilkan judul halaman
-const PageHeader = ({ title }: { title: string }) => (
-  <h1 className="text-3xl font-bold tracking-tight mb-4">{title}</h1>
-);
-
-/* =========================================================
    ================== DEFINISI TIPE DATA ===================
    =========================================================
-   Tipe `PlanFeature` merepresentasikan satu fitur dalam paket.
-   Fitur bisa memiliki catatan tambahan (footnote) dan status negatif
-   jika tidak tersedia di paket tertentu.
 */
 type PlanFeature = {
-  text: string;        // Nama fitur
-  footnote?: string;   // Catatan tambahan (opsional)
-  negative?: boolean;  // Apakah fitur tidak tersedia
+  text: string;
+  footnote?: string;
+  negative?: boolean;
 };
 
-/* =========================================================
-   ==================== DATA FITUR PLAN ====================
-   =========================================================
-   Daftar fitur yang ditawarkan tiap paket.
-*/
-const features: PlanFeature[] = [
+interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  yearlyPrice?: number;
+  badge: string;
+  features: PlanFeature[];
+  isHighlighted: boolean;
+}
+
+const originalFeatures: PlanFeature[] = [
   { text: "Transaksi tak terbatas" },
   { text: "Akun tak terbatas" },
   { text: "Anggaran tak terbatas" },
@@ -62,332 +38,257 @@ const features: PlanFeature[] = [
   { text: "Dukungan prioritas" },
 ];
 
-/* =========================================================
-   ====================== DATA PLAN ========================
-   =========================================================
-   Dua paket utama: Gratis dan Pro, lengkap dengan harga,
-   fitur, dan status popularitas.
-*/
-// Define the type for our plans
-interface Plan {
-  name: string;
-  price: number;  // Monthly price
-  originalPrice?: number;
-  yearlyPrice?: number;  // Yearly price without discount
-  features: PlanFeature[];
-  isMostPopular: boolean;
-  isCurrent: boolean;
-}
-
 const plans: Plan[] = [
   {
-    name: "Gratis",
+    id: "free",
+    name: "Free",
     price: 0,
-    features: features.slice(0, 4),
-    isMostPopular: false,
-    isCurrent: false, // This will be determined dynamically
+    badge: "FREE",
+    features: originalFeatures.slice(0, 4),
+    isHighlighted: false,
   },
   {
+    id: "pro",
     name: "Pro",
     price: 19999,
-    originalPrice: 19999,
-    yearlyPrice: 19999 * 12, // Yearly price without discount
-    features: features,
-    isMostPopular: true,
-    isCurrent: false, // This will be determined dynamically
+    yearlyPrice: 19999 * 12 * 0.8, // 20% discount
+    badge: "PRO",
+    features: originalFeatures,
+    isHighlighted: true,
   },
 ];
 
 /* =========================================================
-   =================== KOMPONEN FITUR ======================
+   ==================== KOMPONEN RIVET =====================
    =========================================================
-   Menampilkan fitur dalam bentuk list dengan ikon cek/tidak.
 */
-function PlanFeature({ text, footnote, negative }: PlanFeature) {
-  return (
-    <li className="flex items-center gap-2">
-      {negative ? (
-        <X className="h-4 w-4 text-muted-foreground" />
-      ) : (
-        <Check className="h-4 w-4 text-primary" />
-      )}
-      <span className={cn("text-sm", { "text-muted-foreground": negative })}>
-        {text}
-      </span>
-      {footnote && (
-        <span className="ml-1 text-xs text-muted-foreground">({footnote})</span>
-      )}
-    </li>
-  );
-}
+const Rivet = ({ className }: { className: string }) => (
+  <div className={cn("absolute w-1.5 h-1.5 rounded-full border border-gray-400/20 opacity-30", className)} />
+);
 
-/* =========================================================
-   =================== HALAMAN BILLING =====================
-   =========================================================
-   Halaman untuk menampilkan paket langganan pengguna.
-   Tersedia pilihan bulanan dan tahunan dengan diskon 20%.
-*/
 function BillingPage() {
-  // State untuk menentukan mode pembayaran: bulanan / tahunan
   const [isYearly, setIsYearly] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const dispatch = useAppDispatch();
   const { user } = useTypedSelector((state) => state.auth);
-
   const [createSubscriptionPayment] = useCreateSubscriptionPaymentMutation();
+  const [cancelSubscription] = useCancelSubscriptionMutation();
 
-  // Fungsi toggle antara Bulanan ↔ Tahunan
   const toggleBilling = () => setIsYearly(!isYearly);
 
-  const handlePayment = async (plan: typeof plans[0]) => {
+  const handlePayment = async (plan: Plan) => {
+    if (plan.id === 'free') return;
     setIsLoading(true);
     setError(null);
-
     try {
-      // Double-check that user exists, in case the UI state wasn't accurate
       if (!user?.id) {
         setError('User not authenticated. Please log in first.');
         setIsLoading(false);
         return;
       }
-
-      // Calculate the actual price based on billing cycle (monthly vs yearly)
-      const price = isYearly
-        ? (plan.yearlyPrice || plan.price * 12)
-        : plan.price;
+      const price = isYearly ? (plan.yearlyPrice || plan.price * 12) : plan.price;
       const planName = `${plan.name} Plan ${isYearly ? '(Tahunan)' : '(Bulanan)'}`;
-
-      // Validate that required fields are not empty/null
-      if (!price || price <= 0) {
-        setError('Invalid price for the selected plan.');
-        setIsLoading(false);
-        return;
-      }
-
-      // Use user ID
-      const userId = user?.id;
-
       const response = await createSubscriptionPayment({
-        userId: userId!,
+        userId: user.id,
         plan: planName,
         price: price,
         currency: 'IDR'
       }).unwrap();
-
       const { token } = response;
-
-      // Load Midtrans SNAP script dynamically
       const script = document.createElement('script');
-      // Use VITE environment variables (Vite uses VITE_ prefix)
       script.src = import.meta.env.VITE_MIDTRANS_IS_PRODUCTION === 'true'
         ? 'https://app.midtrans.com/snap/snap.js'
         : 'https://app.sandbox.midtrans.com/snap/snap.js';
       script.setAttribute('data-client-key', import.meta.env.VITE_MIDTRANS_CLIENT_KEY || '');
-
       script.onload = () => {
         // @ts-ignore
         window.snap.pay(token, {
           onSuccess: function (result: any) {
-            console.log('Payment success:', result);
-            alert('Payment successful!');
-            // Update the user's subscription status in the store
-            if (user) {
-              dispatch(updateCredentials({
-                user: {
-                  ...user,
-                  subscriptionStatus: 'active',
-                  subscriptionPlan: 'Pro',
-                  subscriptionOrderId: result.order_id || null,
-                }
-              }));
-            }
+            dispatch(updateCredentials({
+              user: { ...user, subscriptionStatus: 'active', subscriptionPlan: 'Pro', subscriptionOrderId: result.order_id || null }
+            }));
             setIsLoading(false);
           },
-          onPending: function (result: any) {
-            console.log('Payment pending:', result);
-            alert('Payment pending, please complete the transaction');
-            setIsLoading(false);
-          },
-          onError: function (result: any) {
-            console.log('Payment error:', result);
-            alert('Payment failed, please try again');
-            setIsLoading(false);
-          },
-          onClose: function () {
-            console.log('Customer closed the popup');
-            setIsLoading(false);
-          }
+          onPending: () => setIsLoading(false),
+          onError: () => setIsLoading(false),
+          onClose: () => setIsLoading(false)
         });
       };
-
       document.body.appendChild(script);
-
     } catch (err) {
-      console.error('Payment error:', err);
-      setError('Failed to initiate payment. Please try again.');
+      setError('Gagal memproses pembayaran.');
       setIsLoading(false);
     }
   };
 
-  const [cancelSubscription] = useCancelSubscriptionMutation();
   const handleDowngrade = async () => {
-    if (!user?.subscriptionOrderId) {
-      alert("Anda sudah berada di paket Gratis.");
-      return;
-    }
-
-    if (!confirm("Apakah Anda yakin ingin membatalkan langganan Pro?")) {
-      return;
-    }
-
+    if (!user?.subscriptionOrderId) return;
+    if (!confirm("Apakah Anda yakin ingin membatalkan langganan Pro?")) return;
     setIsLoading(true);
     try {
       await cancelSubscription({ orderId: user.subscriptionOrderId }).unwrap();
       dispatch(updateCredentials({
-        user: {
-          ...user,
-          subscriptionStatus: 'cancelled',
-          subscriptionPlan: 'free'
-        }
+        user: { ...user, subscriptionStatus: 'cancelled', subscriptionPlan: 'free' }
       }));
-      alert("Langganan berhasil dibatalkan.");
     } catch (err) {
-      console.error('Cancellation error:', err);
-      setError('Gagal membatalkan langganan. Silakan coba lagi.');
+      setError('Gagal membatalkan langganan.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <PageLayout>
-      {/* ==================== HEADER HALAMAN ==================== */}
-      <PageHeader title="Tingkatkan paket Anda" />
-      <p className="text-muted-foreground -mt-4 mb-6">
-        Pilih paket yang sesuai dengan kebutuhanmu dan dapatkan fitur Pro
-      </p>
-
-      {/* ==================== TOGGLE PLAN ==================== */}
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex justify-center">
-          {/* Tombol toggle antara Bulanan dan Tahunan */}
-          <div
-            onClick={toggleBilling}
-            className="inline-flex cursor-pointer items-center rounded-full p-1"
-          >
-            <Button
-              variant={!isYearly ? "default" : "ghost"}
-              size="lg"
-              className="rounded-full"
-            >
-              Bulanan
-            </Button>
-            <Button
-              variant={isYearly ? "default" : "ghost"}
-              size="lg"
-              className="rounded-full"
-            >
-              Tahunan
-            </Button>
-          </div>
-        </div>
-
-        {/* ==================== GRID PLAN ==================== */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          {plans.map((plan) => {
-            // Determine if this plan is the user's current plan based on subscription status
-            const isCurrentProPlan = user && user.subscriptionStatus === 'active' && plan.name === 'Pro';
-            const isCurrentFreePlan = (!user || !user.subscriptionStatus || user.subscriptionStatus === 'pending' || user.subscriptionStatus === 'cancelled' || user.subscriptionStatus === 'expired') && plan.name === 'Gratis';
-            const isCurrentPlan = isCurrentProPlan || isCurrentFreePlan;
-
-            return (
-              <Card
-                key={plan.name}
-                className={cn("flex flex-col", {
-                  "border-2 border-primary shadow-lg": plan.isMostPopular,
-                })}
-              >
-                {/* ===== HEADER KARTU PLAN ===== */}
-                <CardHeader className="relative">
-                  {plan.isMostPopular && (
-                    <Badge className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      Paling Populer
-                    </Badge>
-                  )}
-                  <CardTitle>{plan.name}</CardTitle>
-                  <CardDescription>
-                    <span className="text-3xl font-bold">
-                      {isYearly
-                        ? `Rp${(plan.yearlyPrice || plan.price * 12).toLocaleString("id-ID")}`
-                        : `Rp${plan.price.toLocaleString("id-ID")}`}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {plan.price > 0 ? (isYearly ? "/tahun" : "/bulan") : ""}
-                    </span>
-                  </CardDescription>
-                </CardHeader>
-
-                {/* ===== DAFTAR FITUR PLAN ===== */}
-                <CardContent className="flex-1">
-                  <ul className="space-y-2">
-                    {plan.features.map((feature) => (
-                      <PlanFeature key={feature.text} {...feature} />
-                    ))}
-
-                    {/* Fitur tidak tersedia di Free plan */}
-                    {plan.name === "Gratis" &&
-                      features
-                        .slice(4)
-                        .map((feature) => (
-                          <PlanFeature
-                            key={feature.text}
-                            {...feature}
-                            negative
-                          />
-                        ))}
-                  </ul>
-                </CardContent>
-
-                {/* ===== TOMBOL ACTION ===== */}
-                <CardFooter>
-                  <Button
-                    className="w-full"
-                    disabled={isCurrentPlan || isLoading}
-                    variant={plan.isMostPopular ? "default" : "outline"}
-                    onClick={plan.name === "Pro" ? () => handlePayment(plan) :
-                      plan.name === "Gratis" ? () => handleDowngrade() : undefined}
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        {isCurrentPlan
-                          ? "Paket Saat Ini"
-                          : plan.name === "Gratis"
-                            ? "Downgrade"
-                            : "Upgrade ke Pro"}
-                      </>
-                    )}
-                  </Button>
-                </CardFooter>
-              </Card>
-            )
-          })}
-        </div>
-
-        {error && (
-          <div className="mt-6 text-center">
-            <p className="text-destructive">{error}</p>
-          </div>
-        )}
-
+    <div className="container mx-auto py-8 px-4">
+      {/* Header Section */}
+      <div className="max-w-4xl mx-auto mb-10">
+        <h1 className="text-3xl font-bold tracking-tight mb-2">Billing & Subscription</h1>
+        <p className="text-muted-foreground leading-relaxed">
+          Pilih paket yang sesuai dengan kebutuhanmu dan dapatkan fitur Pro
+        </p>
       </div>
-    </PageLayout>
+
+      {/* Toggle Bulanan / Tahunan */}
+      <div className="mb-10 flex justify-center">
+        <div className="inline-flex p-1 bg-muted rounded-full border border-border">
+          <button
+            onClick={() => setIsYearly(false)}
+            className={cn(
+              "px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200",
+              !isYearly ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Bulanan
+          </button>
+          <button
+            onClick={() => setIsYearly(true)}
+            className={cn(
+              "px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2",
+              isYearly ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Tahunan
+            <Badge className="bg-primary text-white border-none text-[10px] py-0 px-1.5 h-4">
+              -20%
+            </Badge>
+          </button>
+        </div>
+      </div>
+
+      {/* Pricing Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {plans.map((plan) => {
+          const isPro = plan.id === 'pro';
+          const isActive = user?.subscriptionStatus === 'active';
+          const isUserPlan = (isPro && isActive) || (!isPro && !isActive);
+          const currentPrice = isYearly ? (plan.yearlyPrice || plan.price * 12) : plan.price;
+
+          return (
+            <div
+              key={plan.id}
+              className={cn(
+                "relative rounded-3xl p-8 flex flex-col border shadow-sm transition-all duration-300",
+                plan.isHighlighted
+                  ? "bg-primary text-primary-foreground border-transparent shadow-lg scale-[1.02]"
+                  : "bg-card text-card-foreground border-border"
+              )}
+            >
+              {/* Rivets */}
+              <Rivet className="top-3 left-3" />
+              <Rivet className="top-3 right-3" />
+              <Rivet className="bottom-3 left-3" />
+              <Rivet className="bottom-3 right-3" />
+
+              {/* Card Header */}
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-xl font-bold uppercase tracking-tight">{plan.name} Plan</h3>
+                <div className={cn(
+                  "flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border",
+                  plan.isHighlighted
+                    ? "bg-white/20 text-white border-white/20"
+                    : "bg-muted text-foreground border-border"
+                )}>
+                  <div className={cn("w-1.5 h-1.5 rounded-full", plan.isHighlighted ? "bg-white animate-pulse" : "bg-primary")} />
+                  {plan.badge}
+                </div>
+              </div>
+
+              {/* Price */}
+              <div className="mb-8 flex items-baseline gap-1">
+                <span className="text-4xl font-bold tracking-tight">
+                  Rp{Math.floor(currentPrice).toLocaleString('id-ID')}
+                </span>
+                <span className={cn("text-sm font-medium", plan.isHighlighted ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                  {isYearly ? "/tahun" : "/bulan"}
+                </span>
+              </div>
+
+              {/* Action Button */}
+              <div className="mb-8">
+                <Button
+                  disabled={isUserPlan || isLoading}
+                  variant={plan.isHighlighted ? "secondary" : "outline"}
+                  onClick={() => (isPro ? handlePayment(plan) : handleDowngrade())}
+                  className={cn(
+                    "w-full h-12 rounded-xl font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-sm",
+                    plan.isHighlighted
+                      ? "bg-white text-primary hover:bg-gray-100"
+                      : "bg-muted text-foreground hover:bg-gray-200"
+                  )}
+                >
+                  {isLoading ? (
+                    <Loader2 className="animate-spin h-5 w-5" />
+                  ) : (
+                    <>
+                      {isUserPlan ? "Paket Saat Ini" : isPro ? "Upgrade Plan" : "Downgrade"}
+                      {!isUserPlan && <ArrowRight className="h-4 w-4" />}
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Features List */}
+              <ul className="space-y-4 pt-4 border-t border-current/10">
+                {plan.features.map((feature) => (
+                  <li key={feature.text} className="flex items-start gap-3">
+                    <div className={cn(
+                      "mt-0.5 w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0",
+                      plan.isHighlighted ? "border-white/30 text-white" : "border-border text-primary"
+                    )}>
+                      <Check className="h-3 w-3" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold">{feature.text}</span>
+                      {feature.footnote && (
+                        <span className={cn("text-[10px] font-medium opacity-70", plan.isHighlighted ? "text-white/80" : "text-muted-foreground")}>
+                          ({feature.footnote})
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+
+                {plan.id === 'free' && (
+                  <li className="flex items-start gap-3 opacity-20 select-none">
+                    <div className="mt-0.5 w-5 h-5 rounded-full border border-border flex items-center justify-center flex-shrink-0">
+                      <X className="h-3 w-3" />
+                    </div>
+                    <span className="text-sm font-semibold">Fitur Pro Lainnya...</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+
+      {error && (
+        <div className="mt-8 p-4 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-center text-sm font-bold animate-in fade-in">
+          {error}
+        </div>
+      )}
+    </div>
   );
 }
 
