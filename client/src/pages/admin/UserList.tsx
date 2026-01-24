@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
     useGetUsersQuery,
-    useAdminUpdateUserMutation,
     useAdminDeleteUserMutation
 } from "@/features/user/userAPI";
 import {
@@ -20,9 +19,7 @@ import {
     ChevronRight,
     Search,
     MoreHorizontal,
-    UserCog,
     Trash2,
-    Shield,
     User as UserIcon
 } from "lucide-react";
 import { format } from "date-fns";
@@ -59,7 +56,7 @@ const UserList = () => {
         search,
     });
 
-    const [updateRole, { isLoading: isUpdating }] = useAdminUpdateUserMutation();
+
     const [deleteUser, { isLoading: isDeleting }] = useAdminDeleteUserMutation();
 
     const users = data?.data?.users || [];
@@ -71,15 +68,7 @@ const UserList = () => {
         setPage(1);
     };
 
-    const handleUpdateRole = async (id: string, currentRole: string) => {
-        const newRole = currentRole === "admin" ? "member" : "admin";
-        try {
-            await updateRole({ id, role: newRole }).unwrap();
-            toast.success(`User role updated to ${newRole}`);
-        } catch (error) {
-            toast.error("Failed to update user role");
-        }
-    };
+
 
     const handleDeleteUser = async () => {
         if (!userToDelete) return;
@@ -151,11 +140,7 @@ const UserList = () => {
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant={user.role === 'admin' ? "default" : "secondary"} className="capitalize">
-                                                    {user.role === 'admin' ? (
-                                                        <Shield className="mr-1 h-3 w-3" />
-                                                    ) : (
-                                                        <UserIcon className="mr-1 h-3 w-3" />
-                                                    )}
+                                                    <UserIcon className="mr-1 h-3 w-3" />
                                                     {user.role}
                                                 </Badge>
                                             </TableCell>
@@ -172,13 +157,7 @@ const UserList = () => {
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                         <DropdownMenuSeparator />
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleUpdateRole(user._id, user.role)}
-                                                            disabled={isUpdating}
-                                                        >
-                                                            <UserCog className="mr-2 h-4 w-4" />
-                                                            Make {user.role === 'admin' ? 'Member' : 'Admin'}
-                                                        </DropdownMenuItem>
+
                                                         <DropdownMenuItem
                                                             className="text-red-600 focus:text-red-600"
                                                             onClick={() => setUserToDelete(user._id)}

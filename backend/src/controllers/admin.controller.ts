@@ -88,88 +88,72 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
     });
 });
 
-export const getAllTransactions = asyncHandler(async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const search = (req.query.search as string) || "";
 
-    const query: any = {};
-    if (search) {
-        query.$or = [
-            { title: { $regex: search, $options: "i" } },
-            { description: { $regex: search, $options: "i" } },
-        ];
-    }
-
-    const transactions = await TransactionModel.find(query)
-        .populate("userId", "name email")
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .sort({ createdAt: -1 });
-
-    const total = await TransactionModel.countDocuments(query);
-
-    res.status(HTTPSTATUS.OK).json({
-        message: "Transactions fetched successfully",
-        data: {
-            transactions,
-            pagination: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-            },
-        },
-    });
-});
-
-export const getUserTransactions = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-
-    const transactions = await TransactionModel.find({ userId: id })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .sort({ createdAt: -1 });
-
-    const total = await TransactionModel.countDocuments({ userId: id });
-
-    res.status(HTTPSTATUS.OK).json({
-        message: "User transactions fetched successfully",
-        data: {
-            transactions,
-            pagination: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-            },
-        },
-    });
-});
-
-export const adminDeleteTransaction = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    const transaction = await TransactionModel.findByIdAndDelete(id);
-
-    if (!transaction) {
-        return res.status(HTTPSTATUS.NOT_FOUND).json({
-            message: "Transaction not found",
-        });
-    }
-
-    res.status(HTTPSTATUS.OK).json({
-        message: "Transaction deleted successfully",
-    });
-});
 
 export const getGlobalStats = asyncHandler(async (req: Request, res: Response) => {
+    const range = (req.query.range as string) || "7d";
+    const now = new Date();
+    let startDate = new Date();
+    let prevStartDate = new Date();
+    let interval: 'day' | 'month' = 'day';
+
+    switch (range) {
+        case "7d":
+            startDate.setDate(now.getDate() - 7);
+            prevStartDate.setDate(now.getDate() - 14);
+            break;
+        case "30d":
+            startDate.setDate(now.getDate() - 30);
+            prevStartDate.setDate(now.getDate() - 60);
+            break;
+        case "90d":
+            startDate.setDate(now.getDate() - 90);
+            prevStartDate.setDate(now.getDate() - 180);
+            break;
+        case "12m":
+            startDate.setFullYear(now.getFullYear() - 1);
+            prevStartDate.setFullYear(now.getFullYear() - 2);
+            interval = 'month';
+            break;
+        default:
+            startDate.setDate(now.getDate() - 7);
+            prevStartDate.setDate(now.getDate() - 14);
+    }
+
+    // Current period metrics
     const totalUsers = await UserModel.countDocuments();
     const totalTransactions = await TransactionModel.countDocuments();
 
-    // Calculate Active Users (active in last 30 days)
+    const currentPeriodTransactions = await TransactionModel.find({
+        createdAt: { $gte: startDate }
+    });
+
+    const currentVolume = currentPeriodTransactions.reduce((sum, t) => sum + t.amount, 0);
+    const currentTxCount = currentPeriodTransactions.length;
+
+    // New users in current period
+    const currentNewUsers = await UserModel.countDocuments({
+        createdAt: { $gte: startDate }
+    });
+
+    // Previous period metrics for trends
+    const prevPeriodTransactions = await TransactionModel.find({
+        createdAt: { $gte: prevStartDate, $lt: startDate }
+    });
+
+    const prevVolume = prevPeriodTransactions.reduce((sum, t) => sum + t.amount, 0);
+    const prevTxCount = prevPeriodTransactions.length;
+    const prevNewUsers = await UserModel.countDocuments({
+        createdAt: { $gte: prevStartDate, $lt: startDate }
+    });
+
+    // Helper for trend calculation
+    const calculateTrend = (current: number, previous: number) => {
+        if (previous === 0) return current > 0 ? 100 : 0;
+        return Math.round(((current - previous) / previous) * 100);
+    };
+
+    // Calculate Active Users (active in last 30 days - constant)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const activeUsers = await UserModel.countDocuments({
@@ -186,17 +170,32 @@ export const getGlobalStats = asyncHandler(async (req: Request, res: Response) =
         createdAt: { $gte: startOfToday }
     });
 
-    // Aggregate total transaction amount (assuming 'amount' field exists and is numeric)
-    const transactionStats = await TransactionModel.aggregate([
+    const totalTransactionAmountAgg = await TransactionModel.aggregate([
+        { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
+    ]);
+    const totalTransactionAmount = totalTransactionAmountAgg.length > 0 ? totalTransactionAmountAgg[0].totalAmount : 0;
+
+    // Growth Data for Chart
+    const growthDataPipeline: any[] = [
+        { $match: { createdAt: { $gte: startDate } } },
         {
             $group: {
-                _id: null,
-                totalAmount: { $sum: "$amount" },
-            },
+                _id: interval === 'day'
+                    ? { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }
+                    : { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                volume: { $sum: "$amount" },
+                count: { $sum: 1 }
+            }
         },
-    ]);
+        { $sort: { "_id": 1 } }
+    ];
 
-    const totalTransactionAmount = transactionStats.length > 0 ? transactionStats[0].totalAmount : 0;
+    const growthResults = await TransactionModel.aggregate(growthDataPipeline);
+    const growthData = growthResults.map(r => ({
+        date: r._id,
+        volume: r.volume,
+        count: r.count
+    }));
 
     res.status(HTTPSTATUS.OK).json({
         message: "Global stats fetched successfully",
@@ -207,6 +206,13 @@ export const getGlobalStats = asyncHandler(async (req: Request, res: Response) =
             activeUsers,
             adminCount,
             todayTransactions,
+            trends: {
+                users: calculateTrend(currentNewUsers, prevNewUsers),
+                transactions: calculateTrend(currentTxCount, prevTxCount),
+                volume: calculateTrend(currentVolume, prevVolume),
+            },
+            growthData,
+            range
         },
     });
 });

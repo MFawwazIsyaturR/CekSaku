@@ -27,6 +27,12 @@ export interface GetUsersParams {
   search: string;
 }
 
+export interface GrowthPoint {
+  date: string;
+  volume: number;
+  count: number;
+}
+
 export interface AdminStats {
   totalUsers: number;
   totalTransactions: number;
@@ -34,27 +40,20 @@ export interface AdminStats {
   activeUsers: number;
   adminCount: number;
   todayTransactions: number;
+  trends: {
+    users: number;
+    transactions: number;
+    volume: number;
+  };
+  growthData: GrowthPoint[];
+  range: string;
 }
 
 export interface GetAdminStatsResponse {
   data: AdminStats;
 }
 
-export interface AdminTransaction {
-  _id: string;
-  userId: {
-    _id: string;
-    name: string;
-    email: string;
-  } | string;
-  amount: number;
-  title: string;
-  description: string;
-  category: string;
-  type: 'income' | 'expense';
-  date: string;
-  createdAt: string;
-}
+
 
 export interface PaymentLog {
   _id: string;
@@ -83,17 +82,7 @@ export interface GetPaymentLogsResponse {
   };
 }
 
-export interface GetTransactionsResponse {
-  data: {
-    transactions: AdminTransaction[];
-    pagination: {
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-    };
-  };
-}
+
 
 export interface AdminUpdateUserParams {
   id: string;
@@ -153,36 +142,15 @@ export const userApi = apiClient.injectEndpoints({
       }),
       invalidatesTags: ['Users', 'transactions' as any],
     }),
-    getAdminStats: builder.query<GetAdminStatsResponse, void>({
-      query: () => ({
+    getAdminStats: builder.query<GetAdminStatsResponse, string | void>({
+      query: (range) => ({
         url: "/admin/stats",
         method: "GET",
+        params: { range: range || "7d" },
       }),
       providesTags: ['Users', 'transactions' as any],
     }),
-    getAdminAllTransactions: builder.query<GetTransactionsResponse, { page: number; limit: number; search: string }>({
-      query: (params) => ({
-        url: "/admin/transactions",
-        method: "GET",
-        params,
-      }),
-      providesTags: ['transactions' as any],
-    }),
-    getUserTransactions: builder.query<GetTransactionsResponse, { id: string; page: number; limit: number }>({
-      query: ({ id, ...params }) => ({
-        url: `/admin/users/${id}/transactions`,
-        method: "GET",
-        params,
-      }),
-      providesTags: ['transactions' as any],
-    }),
-    adminDeleteTransaction: builder.mutation<void, string>({
-      query: (id) => ({
-        url: `/admin/transactions/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ['transactions' as any],
-    }),
+
     getAdminPaymentLogs: builder.query<GetPaymentLogsResponse, { page: number; limit: number; search: string }>({
       query: (params) => ({
         url: "/admin/payments",
@@ -211,9 +179,7 @@ export const {
   useGetAdminStatsQuery,
   useAdminUpdateUserMutation,
   useAdminDeleteUserMutation,
-  useGetAdminAllTransactionsQuery,
-  useGetUserTransactionsQuery,
-  useAdminDeleteTransactionMutation,
+
   useGetAdminPaymentLogsQuery,
   useAdminUpdatePaymentStatusMutation
 } = userApi;

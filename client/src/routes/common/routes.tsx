@@ -33,15 +33,15 @@ export const authenticationRoutePaths = [
   { path: "/kontak", element: <ContactPage /> },
 ];
 
-import GlobalStats from "@/pages/admin/GlobalStats";
-import TransactionAudit from "@/pages/admin/TransactionAudit";
+
+
 import PaymentManagement from "@/pages/admin/PaymentManagement";
 
 export const adminRoutePaths = [
   { path: PROTECTED_ROUTES.ADMIN_DASHBOARD, element: <AdminDashboard /> },
   { path: PROTECTED_ROUTES.ADMIN_USERS, element: <UserList /> },
-  { path: PROTECTED_ROUTES.ADMIN_STATS, element: <GlobalStats /> },
-  { path: PROTECTED_ROUTES.ADMIN_TRANSACTIONS, element: <TransactionAudit /> },
+
+
   { path: PROTECTED_ROUTES.ADMIN_PAYMENTS, element: <PaymentManagement /> },
   {
     path: PROTECTED_ROUTES.ADMIN_SETTINGS,
