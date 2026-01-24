@@ -23,7 +23,6 @@ interface NavItem {
 
 interface SidebarProps {
   isSidebarOpen: boolean;
-  isAdmin?: boolean;
   items?: NavItem[];
 }
 
@@ -39,7 +38,7 @@ const bottomNavItems = [
   { label: "Pengaturan", href: "/settings", icon: Settings },
 ];
 
-function Sidebar({ isSidebarOpen, isAdmin = false, items }: SidebarProps) {
+function Sidebar({ isSidebarOpen, items }: SidebarProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const location = useLocation();
 
@@ -102,26 +101,7 @@ function Sidebar({ isSidebarOpen, isAdmin = false, items }: SidebarProps) {
       </div>
 
       {/* Admin Badge */}
-      {isAdmin && (
-        <div
-          className={cn(
-            "mx-2 px-3 py-2 rounded-lg bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20",
-            !isSidebarOpen && "px-2"
-          )}
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
-            <span
-              className={cn(
-                "text-xs font-semibold text-violet-600 dark:text-violet-400 transition-all duration-300",
-                !isSidebarOpen && "hidden"
-              )}
-            >
-              Admin Panel
-            </span>
-          </div>
-        </div>
-      )}
+
 
       {/* --- Menu Navigasi --- */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
