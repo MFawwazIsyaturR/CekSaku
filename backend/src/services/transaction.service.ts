@@ -85,7 +85,7 @@ export const getAllTransactionService = async (
   const { pageSize, pageNumber } = pagination;
   const skip = (pageNumber - 1) * pageSize;
 
-  const [transations, totalCount] = await Promise.all([
+  const [transactions, totalCount] = await Promise.all([
     TransactionModel.find(filterConditions)
       .skip(skip)
       .limit(pageSize)
@@ -96,7 +96,7 @@ export const getAllTransactionService = async (
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return {
-    transactions: transations,
+    transactions: transactions,
     pagination: {
       pageSize,
       pageNumber,

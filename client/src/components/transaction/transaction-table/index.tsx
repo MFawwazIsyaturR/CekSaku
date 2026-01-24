@@ -39,8 +39,8 @@ const TransactionTable = (props: {
     pageSize: filter.pageSize,
   });
 
-  
-  const transactions = data?.transations || [];
+
+  const transactions = data?.transactions || [];
   console.log(transactions, "transactions")
   const pagination = {
     totalItems: data?.pagination?.totalCount || 0,
@@ -77,13 +77,13 @@ const TransactionTable = (props: {
     console.log(transactionIds);
 
     bulkDeleteTransaction(transactionIds)
-    .unwrap()
-    .then(() => {
-      toast.success("Transaksi berhasil dihapus");
-    })
-    .catch((error) => {
-      toast.error(error.data?.message || "Failed to delete transactions");
-    });
+      .unwrap()
+      .then(() => {
+        toast.success("Transaksi berhasil dihapus");
+      })
+      .catch((error) => {
+        toast.error(error.data?.message || "Failed to delete transactions");
+      });
   };
 
   return (
