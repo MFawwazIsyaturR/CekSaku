@@ -12,6 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -72,7 +73,7 @@ export const transactionColumns: ColumnDef<TransactionType>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => format(row.getValue("createdAt"), "dd MMM yyyy"),
+    cell: ({ row }) => format(row.getValue("createdAt"), "dd MMM yyyy", { locale: id }),
   },
   {
     accessorKey: "title",
@@ -148,11 +149,10 @@ export const transactionColumns: ColumnDef<TransactionType>[] = [
 
       return (
         <div
-          className={`text-right font-medium ${
-            type === _TRANSACTION_TYPE.INCOME
+          className={`text-right font-medium ${type === _TRANSACTION_TYPE.INCOME
               ? "text-green-600"
               : "text-destructive"
-          }`}
+            }`}
         >
           {type === _TRANSACTION_TYPE.EXPENSE ? "-" : "+"}
           {formatCurrency(amount)}
@@ -171,7 +171,7 @@ export const transactionColumns: ColumnDef<TransactionType>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => format(row.original.date, "dd MMM yyyy"),
+    cell: ({ row }) => format(row.original.date, "dd MMM yyyy", { locale: id }),
   },
   {
     accessorKey: "paymentMethod",
@@ -214,9 +214,9 @@ export const transactionColumns: ColumnDef<TransactionType>[] = [
         }
         : { DEFAULT: { label: "One-time", icon: CircleDot } };
 
-        const frequencyKey = isRecurring ? (frequency as string) : "DEFAULT";
-        const frequencyInfo = frequencyMap?.[frequencyKey] || frequencyMap.DEFAULT;
-        const { label, icon: Icon } = frequencyInfo;
+      const frequencyKey = isRecurring ? (frequency as string) : "DEFAULT";
+      const frequencyInfo = frequencyMap?.[frequencyKey] || frequencyMap.DEFAULT;
+      const { label, icon: Icon } = frequencyInfo;
 
       return (
         <div className="flex items-center gap-2">
@@ -225,7 +225,7 @@ export const transactionColumns: ColumnDef<TransactionType>[] = [
             <span>{label}</span>
             {nextDate && isRecurring && (
               <span className="text-xs text-muted-foreground">
-                Next: {format(nextDate, "dd MMM yyyy")}
+                Next: {format(nextDate, "dd MMM yyyy", { locale: id })}
               </span>
             )}
           </div>
@@ -246,11 +246,11 @@ const ActionsCell = ({ row }: { row: any }) => {
   //const isRecurring = row.original.isRecurring;
   const transactionId = row.original.id;
   const { onOpenDrawer } = useEditTransactionDrawer();
-  const [duplicateTransaction,{isLoading:isDuplicating}] = useDuplicateTransactionMutation();
-  const [deleteTransaction,{isLoading: isDeleting}] = useDeleteTransactionMutation();
+  const [duplicateTransaction, { isLoading: isDuplicating }] = useDuplicateTransactionMutation();
+  const [deleteTransaction, { isLoading: isDeleting }] = useDeleteTransactionMutation();
 
 
-  const handleDuplicate = (e:Event) => {
+  const handleDuplicate = (e: Event) => {
     e.preventDefault();
     if (isDuplicating) return;
     duplicateTransaction(transactionId).unwrap().then(() => {
@@ -258,10 +258,10 @@ const ActionsCell = ({ row }: { row: any }) => {
     }).catch((error) => {
       toast.error(error.data?.message || "Gagal menggandakan transaksi");
     });
-    
+
   }
 
-  const handleDelete = (e:Event) => {
+  const handleDelete = (e: Event) => {
     e.preventDefault();
     if (isDeleting) return;
     deleteTransaction(transactionId).unwrap().then(() => {
@@ -269,7 +269,7 @@ const ActionsCell = ({ row }: { row: any }) => {
     }).catch((error) => {
       toast.error(error.data?.message || "Gagal menghapus transaksi");
     });
-    
+
   }
 
   return (
@@ -280,26 +280,26 @@ const ActionsCell = ({ row }: { row: any }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-44" align="end"
-       onCloseAutoFocus={(e) => {
-        if (isDeleting || isDuplicating) {
-          e.preventDefault();
-        }
-      }}
+        onCloseAutoFocus={(e) => {
+          if (isDeleting || isDuplicating) {
+            e.preventDefault();
+          }
+        }}
       >
         <DropdownMenuItem onClick={() => onOpenDrawer(transactionId)}>
           <Pencil className="mr-1 h-4 w-4" />
           Ubah
         </DropdownMenuItem>
         <DropdownMenuItem
-        className="relative"
-        disabled={isDuplicating}
-         onSelect={handleDuplicate}
+          className="relative"
+          disabled={isDuplicating}
+          onSelect={handleDuplicate}
         >
           <Copy className="mr-1 h-4 w-4" />
           Duplikat
           {isDuplicating && <Loader className="ml-1 h-4 w-4 absolute right-2 animate-spin" />}
         </DropdownMenuItem>
-        
+
         {/* {isRecurring && (
           <>
             <DropdownMenuItem>
@@ -308,15 +308,15 @@ const ActionsCell = ({ row }: { row: any }) => {
             </DropdownMenuItem>
           </>
         )} */}
-          <DropdownMenuSeparator />
-            <DropdownMenuItem className="relative !text-destructive"
-              disabled={isDeleting}
-              onSelect={handleDelete}
-            >
-              <Trash2 className="mr-1 h-4 w-4 !text-destructive" />
-              Hapus
-              {isDeleting && <Loader className="ml-1 h-4 w-4 absolute right-2 animate-spin" />}
-            </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="relative !text-destructive"
+          disabled={isDeleting}
+          onSelect={handleDelete}
+        >
+          <Trash2 className="mr-1 h-4 w-4 !text-destructive" />
+          Hapus
+          {isDeleting && <Loader className="ml-1 h-4 w-4 absolute right-2 animate-spin" />}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

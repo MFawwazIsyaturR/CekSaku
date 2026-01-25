@@ -35,6 +35,7 @@ import {
     ChartLegendContent,
 } from "@/components/ui/chart";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import { useGetAdminStatsQuery } from "@/features/user/userAPI";
 import { formatCurrency } from "@/lib/format-currency";
 import { cn } from "@/lib/utils";
@@ -219,9 +220,9 @@ const GlobalStats = () => {
                                     try {
                                         const date = new Date(value);
                                         if (range === "12m") {
-                                            return format(date, "MMM");
+                                            return format(date, "MMM", { locale: id });
                                         }
-                                        return format(date, "d MMM");
+                                        return format(date, "d MMM", { locale: id });
                                     } catch (e) {
                                         return value;
                                     }
@@ -239,7 +240,7 @@ const GlobalStats = () => {
                                     <ChartTooltipContent
                                         labelFormatter={(value) => {
                                             try {
-                                                return format(new Date(value), "EEEE, d MMMM yyyy");
+                                                return format(new Date(value), "EEEE, d MMMM yyyy", { locale: id });
                                             } catch (e) {
                                                 return value;
                                             }

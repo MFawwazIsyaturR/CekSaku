@@ -8,6 +8,7 @@ import {
   startOfYear,
   endOfDay,
 } from "date-fns";
+import { id } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -18,14 +19,14 @@ import { cn } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 
 export const DateRangeEnum = {
-  LAST_30_DAYS : "30days",
-  LAST_MONTH : "lastMonth",
-  LAST_3_MONTHS : "last3Months",
-  LAST_YEAR : "lastYear",
-  THIS_MONTH : "thisMonth",
-  THIS_YEAR : "thisYear",
-  ALL_TIME : "allTime",
-  CUSTOM : "custom"
+  LAST_30_DAYS: "30days",
+  LAST_MONTH: "lastMonth",
+  LAST_3_MONTHS: "last3Months",
+  LAST_YEAR: "lastYear",
+  THIS_MONTH: "thisMonth",
+  THIS_YEAR: "thisYear",
+  ALL_TIME: "allTime",
+  CUSTOM: "custom"
 } as const;
 
 export type DateRangeEnumType = (typeof DateRangeEnum)[keyof typeof DateRangeEnum];
@@ -135,14 +136,13 @@ export const DateRangeSelect = ({
 
   const displayText = dateRange
     ? presets.find((p) => p.value === dateRange.value)?.label ||
-      (dateRange.from
-        ? `${format(dateRange.from, "dd MMM y")} - ${
-            dateRange.to ? format(dateRange.to, "dd MMM y") : "Present"
-          }`
-        : "Select a duration")
+    (dateRange.from
+      ? `${format(dateRange.from, "dd MMM y", { locale: id })} - ${dateRange.to ? format(dateRange.to, "dd MMM y", { locale: id }) : "Sekarang"
+      }`
+      : "Select a duration")
     : "Select a duration";
 
-      // Set default range on initial render
+  // Set default range on initial render
   useEffect(() => {
     if (!dateRange) {
       const defaultPreset = presets.find(p => p.value === defaultRange);

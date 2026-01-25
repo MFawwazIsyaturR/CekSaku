@@ -22,6 +22,7 @@ import {
     XCircle
 } from "lucide-react";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/format-currency";
 
@@ -157,7 +158,7 @@ const PaymentManagement = () => {
                                                 {getStatusBadge(log.status)}
                                             </TableCell>
                                             <TableCell className="text-right text-xs text-muted-foreground whitespace-nowrap">
-                                                {format(new Date(log.createdAt), "dd/MM/yy HH:mm")}
+                                                {format(new Date(log.createdAt), "dd/MM/yy HH:mm", { locale: id })}
                                             </TableCell>
                                         </TableRow>
                                     ))

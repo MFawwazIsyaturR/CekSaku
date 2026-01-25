@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { LayoutGrid, Users, Settings, CreditCard } from "lucide-react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
+import AdminMobileBottomNavbar from "@/components/navbar/AdminMobileBottomNavbar";
 
 const adminNavItems = [
     { label: "Dashboard", href: "/admin", icon: LayoutGrid },
@@ -14,10 +15,6 @@ const adminNavItems = [
 
 function AdminLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-
-
-
 
     return (
         <div className="flex min-h-screen w-full bg-[var(--bg-color)] dark:bg-background">
@@ -54,11 +51,13 @@ function AdminLayout() {
                 </header>
 
                 <main className="flex-1 bg-gray-100/40 dark:bg-gray-900/50">
-                    <div className="p-4 md:p-6 lg:p-8">
+                    <div className="p-4 md:p-6 lg:p-8 pb-28 md:pb-8">
                         <Outlet />
                     </div>
                 </main>
             </div>
+
+            <AdminMobileBottomNavbar />
         </div>
     );
 }

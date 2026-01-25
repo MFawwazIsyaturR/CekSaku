@@ -23,6 +23,7 @@ import {
     User as UserIcon
 } from "lucide-react";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -145,7 +146,7 @@ const UserList = () => {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                {format(new Date(user.createdAt), "PPP")}
+                                                {format(new Date(user.createdAt), "PPP", { locale: id })}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <DropdownMenu>

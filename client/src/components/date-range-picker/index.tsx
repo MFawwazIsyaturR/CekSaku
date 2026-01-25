@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { addDays, format } from "date-fns"
+import { id } from "date-fns/locale"
 import { CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 
@@ -39,11 +40,11 @@ export function CalendarDateRangePicker({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
+                  {format(date.from, "LLL dd, y", { locale: id })} -{" "}
+                  {format(date.to, "LLL dd, y", { locale: id })}
                 </>
               ) : (
-                format(date.from, "LLL dd, y")
+                format(date.from, "LLL dd, y", { locale: id })
               )
             ) : (
               <span>Pick a date</span>

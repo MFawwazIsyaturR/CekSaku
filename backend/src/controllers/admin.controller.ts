@@ -5,6 +5,7 @@ import UserModel from "../models/user.model";
 import TransactionModel from "../models/transaction.model";
 import PaymentLogModel, { PaymentStatusEnum } from "../models/payment-log.model";
 import { syncPaymentStatus } from "../services/payment.service";
+import { startOfMonth, startOfYear, subMonths, subYears } from "date-fns";
 
 export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
@@ -102,9 +103,31 @@ export const getGlobalStats = asyncHandler(async (req: Request, res: Response) =
             startDate.setDate(now.getDate() - 7);
             prevStartDate.setDate(now.getDate() - 14);
             break;
-        case "30d":
+        case "30days":
             startDate.setDate(now.getDate() - 30);
             prevStartDate.setDate(now.getDate() - 60);
+            break;
+        case "lastMonth":
+            startDate = startOfMonth(subMonths(now, 1));
+            prevStartDate = startOfMonth(subMonths(now, 2));
+            break;
+        case "last3Months":
+            startDate = startOfMonth(subMonths(now, 3));
+            prevStartDate = startOfMonth(subMonths(now, 6));
+            break;
+        case "lastYear":
+            startDate = startOfYear(subYears(now, 1));
+            prevStartDate = startOfYear(subYears(now, 2));
+            interval = 'month';
+            break;
+        case "thisMonth":
+            startDate = startOfMonth(now);
+            prevStartDate = startOfMonth(subMonths(now, 1));
+            break;
+        case "thisYear":
+            startDate = startOfYear(now);
+            prevStartDate = startOfYear(subYears(now, 1));
+            interval = 'month';
             break;
         case "90d":
             startDate.setDate(now.getDate() - 90);
@@ -114,6 +137,10 @@ export const getGlobalStats = asyncHandler(async (req: Request, res: Response) =
             startDate.setFullYear(now.getFullYear() - 1);
             prevStartDate.setFullYear(now.getFullYear() - 2);
             interval = 'month';
+            break;
+        case "allTime":
+            startDate = new Date(0); // Epoch
+            prevStartDate = new Date(0);
             break;
         default:
             startDate.setDate(now.getDate() - 7);

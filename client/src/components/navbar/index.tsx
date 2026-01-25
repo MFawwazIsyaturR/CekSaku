@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 // import { UserNav } from "./user-nav";
 import Sidebar from "../sidebar/Sidebar"; // <-- Import ini sudah tidak terpakai
 import { cn } from "@/lib/utils";
@@ -21,14 +21,14 @@ function Navbar({ isSidebarOpen = false, setIsSidebarOpen }: NavbarProps) {
 
   return (
     <header className="flex h-8 items-center px-4 lg:h-[60px] lg:px-6">
-      
+
       {/* ============================================
           ============ TOGGLE SIDEBAR MOBILE =========
           ============================================
           Blok <Sheet>...</Sheet> ini dihapus seluruhnya 
           karena perannya digantikan oleh MobileBottomNavbar.
       */}
-      
+
       {/* BLOK YANG DIHAPUS:
       <Sheet>
         <SheetTrigger asChild>
@@ -56,14 +56,10 @@ function Navbar({ isSidebarOpen = false, setIsSidebarOpen }: NavbarProps) {
         <Button
           variant="ghost"
           size="icon"
-          className={cn(
-            "hidden md:flex h-10 w-10 items-center justify-center relative z-50 cursor-pointer",
-            "ml-2",  
-            "hover:bg-accent hover:text-accent-foreground"
-          )}
+          className="hidden md:flex"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
-          <Menu className="h-14 w-14 pointer-events-none" />
+          <LayoutGrid className="h-5 w-5" />
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
       )}
