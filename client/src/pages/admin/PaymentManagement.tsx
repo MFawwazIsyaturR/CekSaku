@@ -158,7 +158,9 @@ const PaymentManagement = () => {
                                                 {getStatusBadge(log.status)}
                                             </TableCell>
                                             <TableCell className="text-right text-xs text-muted-foreground whitespace-nowrap">
-                                                {format(new Date(log.createdAt), "dd/MM/yy HH:mm", { locale: id })}
+                                                {log.status === "SUKSES"
+                                                    ? format(new Date(log.createdAt), "dd/MM/yy HH:mm", { locale: id })
+                                                    : "-"}
                                             </TableCell>
                                         </TableRow>
                                     ))
