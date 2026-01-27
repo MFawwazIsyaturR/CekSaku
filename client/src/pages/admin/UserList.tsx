@@ -45,7 +45,10 @@ import {
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
+import { useAuth } from "@/hooks/useAuth";
+
 const UserList = () => {
+    const { user: currentUser } = useAuth();
     const [page, setPage] = useState(1);
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
@@ -159,13 +162,21 @@ const UserList = () => {
                                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                         <DropdownMenuSeparator />
 
-                                                        <DropdownMenuItem
-                                                            className="text-red-600 focus:text-red-600"
-                                                            onClick={() => setUserToDelete(user._id)}
-                                                        >
-                                                            <Trash2 className="mr-2 h-4 w-4" />
-                                                            Delete User
-                                                        </DropdownMenuItem>
+                                                        {currentUser?.id !== user._id && (
+                                                            <DropdownMenuItem
+                                                                className="text-red-600 focus:text-red-600"
+                                                                onClick={() => setUserToDelete(user._id)}
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                Delete User
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {currentUser?.id === user._id && (
+                                                            <DropdownMenuItem disabled className="text-muted-foreground italic">
+                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                You (Cannot delete)
+                                                            </DropdownMenuItem>
+                                                        )}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>

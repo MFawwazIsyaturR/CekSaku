@@ -72,6 +72,13 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const currentUser = req.user as any;
+
+    if (currentUser._id.toString() === id) {
+        return res.status(HTTPSTATUS.BAD_REQUEST).json({
+            message: "You cannot delete your own account",
+        });
+    }
 
     const user = await UserModel.findByIdAndDelete(id);
 
@@ -277,6 +284,8 @@ export const getAllPaymentLogs = asyncHandler(async (req: Request, res: Response
                 _id: 1,
                 name: 1,
                 email: 1,
+                subscriptionStatus: 1,
+                subscriptionExpiredAt: 1,
                 latestLog: 1,
             }
         },
@@ -299,9 +308,21 @@ export const getAllPaymentLogs = asyncHandler(async (req: Request, res: Response
 
     // Transform to match the expected PaymentLog structure
     const paymentLogs = usersWithLogs.map(user => {
+        const isExpired = user.subscriptionExpiredAt && new Date(user.subscriptionExpiredAt) < new Date();
+        const isCancelled = user.subscriptionStatus === 'cancelled';
+
+        // If subscription is expired or cancelled, we want to show it as "BELUM DIBAYAR" for the NEXT cycle
+        // unless they already have a "PROSES" transaction.
+        let status = user.latestLog?.status || PaymentStatusEnum.UNPAID;
+
+        if ((isExpired || isCancelled) && status === PaymentStatusEnum.SUCCESS) {
+            status = PaymentStatusEnum.UNPAID;
+        }
+
         if (user.latestLog) {
             return {
                 ...user.latestLog,
+                status, // Override with calculated status
                 userId: {
                     _id: user._id,
                     name: user.name,
