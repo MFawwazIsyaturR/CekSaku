@@ -51,7 +51,6 @@ export const registerService = async (body: RegisterSchemaType) => {
         userId: newUser._id,
         frequency: ReportFrequencyEnum.MONTHLY,
         isEnabled: true,
-        // FIX: Tambahkan argumen frekuensi
         nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY),
         lastSentDate: null,
       });

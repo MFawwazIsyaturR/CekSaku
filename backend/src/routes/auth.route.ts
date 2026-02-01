@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
-  forgotPasswordController, // <-- Impor
-  resetPasswordController,  // <-- Impor
+  forgotPasswordController,
+  resetPasswordController,  
   verifyResetTokenController,
   githubLoginController,
   googleLoginController,
