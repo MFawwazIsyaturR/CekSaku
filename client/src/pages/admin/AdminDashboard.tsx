@@ -1,31 +1,18 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import {
     Users,
     Activity,
     DollarSign,
     TrendingUp,
-    UserCheck,
-    ShieldCheck,
     ArrowUpRight,
     ArrowDownRight,
-    Calendar,
 } from "lucide-react";
 import {
     AreaChart,
     Area,
     XAxis,
     YAxis,
-    CartesianGrid,
-    ResponsiveContainer,
 } from "recharts";
 import {
     ChartConfig,
@@ -38,7 +25,6 @@ import {
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useGetAdminStatsQuery } from "@/features/user/userAPI";
-import { formatCurrency } from "@/lib/format-currency";
 import { cn } from "@/lib/utils";
 import CountUp from "react-countup";
 import { DateRangeSelect, DateRangeType } from "@/components/date-range-select";
