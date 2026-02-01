@@ -161,9 +161,7 @@ export function AccountForm() {
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={isUpdating || isDeleting} className="mb-3 bg-red-600 hover:bg-red-700 text-white">
-                Hapus Akun
-              </Button>
+            
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>

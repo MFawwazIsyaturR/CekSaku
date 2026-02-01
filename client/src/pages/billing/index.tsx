@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Check, X, Loader2, ArrowRight } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAppDispatch, useTypedSelector } from "@/app/hook";
 import { useCreateSubscriptionPaymentMutation, useCancelSubscriptionMutation } from "@/features/payment/paymentAPI";
 import { updateCredentials } from "@/features/auth/authSlice";
