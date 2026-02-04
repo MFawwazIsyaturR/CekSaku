@@ -16,7 +16,7 @@ import TermsAndConditions from "@/pages/landing/TermsAndConditions";
 import ContactPage from "@/pages/landing/ContactPage";
 import BillingPage from "@/pages/billing";
 import Payment from "@/pages/settings/payment";
-import AssetsPage from "@/pages/assets";
+// import AssetsPage from "@/pages/assets";
 import VerifyEmail from "@/pages/auth/_component/verify-email";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 
@@ -56,7 +56,7 @@ export const protectedRoutePaths = [
   { path: PROTECTED_ROUTES.TRANSACTIONS, element: <Transactions /> },
   { path: PROTECTED_ROUTES.REPORTS, element: <Reports /> },
   { path: PROTECTED_ROUTES.BILLING, element: <BillingPage /> },
-  { path: PROTECTED_ROUTES.ASSETS, element: <AssetsPage /> },
+  // { path: PROTECTED_ROUTES.ASSETS, element: <AssetsPage /> },
   {
     path: PROTECTED_ROUTES.SETTINGS,
     element: <Settings />,

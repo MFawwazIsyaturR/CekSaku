@@ -75,6 +75,7 @@ export interface AIScanReceiptData {
 export interface AIScanReceiptResponse {
   message: string;
   data: AIScanReceiptData;
+  remainingQuota?: number;
 }
 
 export interface GetSingleTransactionResponse {

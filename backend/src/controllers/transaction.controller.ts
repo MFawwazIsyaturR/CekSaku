@@ -1,4 +1,4 @@
-  import { Request, Response } from "express";
+import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { HTTPSTATUS } from "../config/http.config";
 import {
@@ -152,12 +152,59 @@ export const bulkTransactionController = asyncHandler(
 export const scanReceiptController = asyncHandler(
   async (req: Request, res: Response) => {
     const file = req?.file;
+    const userId = req.user?._id;
+
+    // Check if user is Pro subscriber
+    if (req.user?.subscriptionStatus !== 'active') {
+      return res.status(HTTPSTATUS.FORBIDDEN).json({
+        message: "Feature hanya tersedia untuk pengguna Pro",
+        error: "SUBSCRIPTION_REQUIRED"
+      });
+    }
+
+    // Check quota reset (if it's a new month)
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const lastResetDate = req.user?.aiScanQuotaResetAt ? new Date(req.user.aiScanQuotaResetAt) : null;
+    const lastResetMonth = lastResetDate?.getMonth();
+    const lastResetYear = lastResetDate?.getFullYear();
+
+    // If it's a new month, reset the quota
+    if (!lastResetDate || currentMonth !== lastResetMonth || currentYear !== lastResetYear) {
+      req.user!.aiScanQuota = 10;
+      req.user!.aiScanQuotaResetAt = now;
+      await req.user!.save();
+    }
+
+    // Check if quota is available
+    if (req.user!.aiScanQuota <= 0) {
+      return res.status(HTTPSTATUS.FORBIDDEN).json({
+        message: "Kuota AI scan habis. Reset pada tanggal 1 bulan depan.",
+        error: "QUOTA_EXCEEDED",
+        remainingQuota: 0
+      });
+    }
 
     const result = await scanReceiptService(file);
+
+    // If scanning failed, don't decrement quota
+    if (result.error) {
+      return res.status(HTTPSTATUS.BAD_REQUEST).json({
+        message: result.error,
+        remainingQuota: req.user!.aiScanQuota
+      });
+    }
+
+    // Decrement quota after successful scan
+    req.user!.aiScanQuota -= 1;
+    await req.user!.save();
 
     return res.status(HTTPSTATUS.OK).json({
       message: "Reciept scanned successfully",
       data: result,
+      remainingQuota: req.user!.aiScanQuota
     });
   }
 );

@@ -5,7 +5,7 @@ import {
   LayoutGrid,
   TrendingUp,
   ReceiptText,
-  Briefcase,
+  // Briefcase,
   CreditCard,
   LogOut,
 } from "lucide-react";
@@ -33,7 +33,7 @@ const topLevelNavItems = [
 ];
 
 const bottomNavItems = [
-  { label: "Aset & Investasi", href: "/assets", icon: Briefcase },
+  // { label: "Aset & Investasi", href: "/assets", icon: Briefcase },
   { label: "Penagihan", href: "/billing", icon: CreditCard },
   { label: "Pengaturan", href: "/settings", icon: Settings },
 ];

@@ -3,10 +3,10 @@
 
 body {
   pointer-events: fill !important;
- font-family: "Inter", sans-serif !important;
+  font-family: "Inter", sans-serif !important;
 }
 
-.recurring-control button span{
+.recurring-control button span {
   text-transform: capitalize !important;
 }
 
@@ -32,6 +32,7 @@ body {
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -70,6 +71,7 @@ body {
   --accent: oklch(0.967 0.001 286.375);
   --accent-foreground: oklch(0.21 0.006 285.885);
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
   --ring: #427ec5;
@@ -102,11 +104,12 @@ body {
   --primary-foreground: oklch(98.193% 0.01802 156.147);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);  
+  --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
   --accent: oklch(0.274 0.006 286.033);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: #427ec5;
@@ -129,6 +132,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-[var(--bg-color)] dark:bg-background text-foreground;
   }
@@ -139,39 +143,53 @@ html {
 }
 
 
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
   /* overflow-x: hidden;  */
-  scrollbar-width: thin; /* 'thin' = tipis, 'auto' = default */
-  scrollbar-color: #888 #1e1e1e; /* (1) Warna gagang, (2) Warna track */
+  scrollbar-width: thin;
+  /* 'thin' = tipis, 'auto' = default */
+  scrollbar-color: #888 #1e1e1e;
+  /* (1) Warna gagang, (2) Warna track */
 }
 
 /* --- Scrollbar Minimalis Modern (Dark Mode) --- */
 
 /* Ini menargetkan semua scrollbar di body */
 body::-webkit-scrollbar {
-  width: 8px; /* Lebar scrollbar */
+  width: 8px;
+  /* Lebar scrollbar */
 }
 
 /* Bagian "track" atau rel scrollbar */
 body::-webkit-scrollbar-track {
-  background: #1e1e1e; /* Warna background track, sesuaikan dengan bg gelap web kamu */
+  background: #1e1e1e;
+  /* Warna background track, sesuaikan dengan bg gelap web kamu */
 }
 
 /* Bagian "thumb" atau gagang scrollbar yang digerakkan */
 body::-webkit-scrollbar-thumb {
-  background-color: #555; /* Warna gagang scrollbar */
-  border-radius: 10px; /* Membuat gagang jadi bulat */
-  border: 2px solid #1e1e1e; /* Memberi sedikit padding agar tidak nempel track */
+  background-color: #555;
+  /* Warna gagang scrollbar */
+  border-radius: 10px;
+  /* Membuat gagang jadi bulat */
+  border: 2px solid #1e1e1e;
+  /* Memberi sedikit padding agar tidak nempel track */
 }
 
 /* Efek saat gagang di-hover */
 body::-webkit-scrollbar-thumb:hover {
-  background-color: #888; /* Warna gagang saat di-hover */
+  background-color: #888;
+  /* Warna gagang saat di-hover */
 }
 
 .landing-page-container,
@@ -185,6 +203,7 @@ img {
   height: auto;
   display: block;
 }
+
 .hero-section-gradient::before {
   width: 120%;
   left: 50%;
@@ -226,8 +245,10 @@ img {
 @keyframes reveal-up {
   from {
     opacity: 0;
-    transform: translateY(40px); /* Mulai dari 40px di bawah */
+    transform: translateY(40px);
+    /* Mulai dari 40px di bawah */
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -239,4 +260,3 @@ img {
 --chart-3: oklch(0.48 0.19 148.6);
 --chart-4: oklch(0.28 0.11 145.8);
 --chart-5: oklch(0.18 0.08 147.0); */
-

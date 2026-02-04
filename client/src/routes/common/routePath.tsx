@@ -15,7 +15,7 @@ export const PROTECTED_ROUTES = {
   TRANSACTIONS: "/transactions",
   BILLING: "/billing",
   REPORTS: "/reports",
-  ASSETS: "/assets",
+  // ASSETS: "/assets",
   SETTINGS: "/settings",
   SETTINGS_APPEARANCE: "/settings/appearance",
   SETTINGS_BILLING: "/settings/billing",

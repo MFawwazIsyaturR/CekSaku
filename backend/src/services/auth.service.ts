@@ -88,6 +88,12 @@ export const loginService = async (body: LoginSchemaType) => {
     throw new UnauthorizedException("Please verify your email address before logging in");
   }
 
+  // Initialize quota for existing users if missing
+  if (user.aiScanQuota === undefined) {
+    user.aiScanQuota = 10;
+    await user.save();
+  }
+
   const { token, expiresAt } = signJwtToken({ userId: user.id });
   const reportSetting = await ReportSettingModel.findOne(
     { userId: user.id },
@@ -132,34 +138,41 @@ export const googleLoginService = async (code: string) => {
             password: Math.random().toString(36).slice(-8),
           });
           await newUser.save({ session });
-          
+
           const reportSetting = new ReportSettingModel({
             userId: newUser._id,
             frequency: ReportFrequencyEnum.MONTHLY,
             isEnabled: true,
             // FIX: Tambahkan argumen frekuensi
-            nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY), 
+            nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY),
             lastSentDate: null,
           });
           await reportSetting.save({ session });
-          
+
           user = newUser;
         });
       } finally {
         session.endSession();
       }
     }
-    
+
     if (!user) {
       throw new InternalServerErrorException("Failed to create or find user.");
     }
-    
+
     const { token, expiresAt } = signJwtToken({ userId: user.id });
+
+    // Initialize quota for existing users if missing
+    if (user.aiScanQuota === undefined) {
+      user.aiScanQuota = 10;
+      await user.save();
+    }
+
     const reportSetting = await ReportSettingModel.findOne(
       { userId: user.id },
       { _id: 1, frequency: 1, isEnabled: 1 }
     ).lean();
-    
+
     return {
       user: user.omitPassword(),
       accessToken: token,
@@ -196,12 +209,12 @@ export const githubLoginService = async (code: string) => {
     let { email } = userResponse.data;
 
     if (!email) {
-       const emailsResponse = await axios.get("https://api.github.com/user/emails", {
-         headers: { Authorization: `Bearer ${accessToken}` },
-       });
-       const primaryEmail = emailsResponse.data.find((e: any) => e.primary)?.email;
-       if (!primaryEmail) throw new UnauthorizedException("GitHub account has no public email.");
-       email = primaryEmail;
+      const emailsResponse = await axios.get("https://api.github.com/user/emails", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const primaryEmail = emailsResponse.data.find((e: any) => e.primary)?.email;
+      if (!primaryEmail) throw new UnauthorizedException("GitHub account has no public email.");
+      email = primaryEmail;
     }
 
     let user = await UserModel.findOne({ email });
@@ -222,7 +235,7 @@ export const githubLoginService = async (code: string) => {
             userId: newUser._id,
             frequency: ReportFrequencyEnum.MONTHLY,
             isEnabled: true,
-             // FIX: Tambahkan argumen frekuensi
+            // FIX: Tambahkan argumen frekuensi
             nextReportDate: calculateNextReportDate(ReportFrequencyEnum.MONTHLY),
             lastSentDate: null,
           });
@@ -234,12 +247,19 @@ export const githubLoginService = async (code: string) => {
         session.endSession();
       }
     }
-    
+
     if (!user) {
-        throw new InternalServerErrorException("Failed to create or find user.");
+      throw new InternalServerErrorException("Failed to create or find user.");
     }
 
     const { token, expiresAt } = signJwtToken({ userId: user.id });
+
+    // Initialize quota for existing users if missing
+    if (user.aiScanQuota === undefined) {
+      user.aiScanQuota = 10;
+      await user.save();
+    }
+
     const reportSetting = await ReportSettingModel.findOne({ userId: user.id }).lean();
 
     return {
@@ -274,34 +294,34 @@ export const forgotPasswordService = async (email: string) => {
 };
 
 export const verifyResetTokenService = async (token: string) => {
-    const records = await PasswordResetTokenModel.find({ expiresAt: { $gt: new Date() } });
-    for (const record of records) {
-        const isValid = await bcrypt.compare(token, record.token);
-        if (isValid) return { valid: true };
-    }
-    throw new UnauthorizedException("Invalid or expired password reset token.");
+  const records = await PasswordResetTokenModel.find({ expiresAt: { $gt: new Date() } });
+  for (const record of records) {
+    const isValid = await bcrypt.compare(token, record.token);
+    if (isValid) return { valid: true };
+  }
+  throw new UnauthorizedException("Invalid or expired password reset token.");
 };
 
 export const resetPasswordService = async (token: string, newPassword: string) => {
-    const records = await PasswordResetTokenModel.find({ expiresAt: { $gt: new Date() } });
-    let validRecord = null;
-    for (const record of records) {
-        if (await bcrypt.compare(token, record.token)) {
-            validRecord = record;
-            break;
-        }
+  const records = await PasswordResetTokenModel.find({ expiresAt: { $gt: new Date() } });
+  let validRecord = null;
+  for (const record of records) {
+    if (await bcrypt.compare(token, record.token)) {
+      validRecord = record;
+      break;
     }
-    if (!validRecord) {
-        throw new UnauthorizedException("Invalid or expired password reset token.");
-    }
-    const user = await UserModel.findById(validRecord.userId);
-    if (!user) {
-        throw new NotFoundException("User not found.");
-    }
-    user.password = newPassword;
-    await user.save();
-    await PasswordResetTokenModel.findByIdAndDelete(validRecord._id);
-    return { message: "Password has been reset successfully." };
+  }
+  if (!validRecord) {
+    throw new UnauthorizedException("Invalid or expired password reset token.");
+  }
+  const user = await UserModel.findById(validRecord.userId);
+  if (!user) {
+    throw new NotFoundException("User not found.");
+  }
+  user.password = newPassword;
+  await user.save();
+  await PasswordResetTokenModel.findByIdAndDelete(validRecord._id);
+  return { message: "Password has been reset successfully." };
 };
 
 export const refreshTokenService = async (userId: string) => {
@@ -311,6 +331,13 @@ export const refreshTokenService = async (userId: string) => {
   }
 
   const { token, expiresAt } = signJwtToken({ userId: user.id });
+
+  // Initialize quota for existing users if missing
+  if (user.aiScanQuota === undefined) {
+    user.aiScanQuota = 10;
+    await user.save();
+  }
+
   const reportSetting = await ReportSettingModel.findOne(
     { userId: user.id },
     { _id: 1, frequency: 1, isEnabled: 1 }

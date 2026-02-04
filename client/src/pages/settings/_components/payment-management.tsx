@@ -166,7 +166,7 @@ export default function PaymentManagement() {
           <CardHeader>
             <CardTitle className="text-primary">Buka Potensi Penuh dengan Pro</CardTitle>
             <CardDescription>
-              Nikmati fitur tak terbatas, analitik lanjutan, dan dukungan prioritas.
+              Nikmati fitur tak terbatas dan pemindaian struk dengan AI.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -177,7 +177,7 @@ export default function PaymentManagement() {
               </li>
               <li className="flex items-center gap-2">
                 <Badge variant="secondary" className="h-5 w-5 rounded-full p-0 flex items-center justify-center">✓</Badge>
-                Analitik Lanjutan
+                Akun Tak Terbatas
               </li>
               <li className="flex items-center gap-2">
                 <Badge variant="secondary" className="h-5 w-5 rounded-full p-0 flex items-center justify-center">✓</Badge>
@@ -185,7 +185,7 @@ export default function PaymentManagement() {
               </li>
               <li className="flex items-center gap-2">
                 <Badge variant="secondary" className="h-5 w-5 rounded-full p-0 flex items-center justify-center">✓</Badge>
-                Dukungan Prioritas
+                Pemindaian Struk AI
               </li>
             </ul>
           </CardContent>

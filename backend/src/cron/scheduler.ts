@@ -2,6 +2,7 @@ import cron from "node-cron";
 import { processRecurringTransactions } from "./jobs/transaction.job";
 import { processReportJob } from "./jobs/report.job";
 import { checkSavingsGoals } from "./jobs/savings-alert.job";
+import { resetAiScanQuota } from "./jobs/quota-reset.job";
 
 const scheduleJob = (name: string, time: string, job: Function) => {
   console.log(`Scheduling ${name} at ${time}`);
@@ -30,5 +31,8 @@ export const startJobs = () => {
     //run 2:30am every day
     scheduleJob("Reports", "30 2 * * *", processReportJob),
     scheduleJob("Peringatan Tabungan Gaji", "0 3 * * *", checkSavingsGoals),
+
+    // Reset AI scan quota on 1st of each month at 00:05
+    scheduleJob("AI Scan Quota Reset", "5 0 1 * *", resetAiScanQuota),
   ];
 };

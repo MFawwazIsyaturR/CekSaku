@@ -32,10 +32,8 @@ const originalFeatures: PlanFeature[] = [
   { text: "Akun tak terbatas" },
   { text: "Anggaran tak terbatas" },
   { text: "Kategori tak terbatas" },
-  { text: "Pemindaian struk dengan AI", footnote: "10 pemindaian per bulan" },
-  { text: "Analitik lanjutan" },
   { text: "Ekspor data (CSV, PDF)" },
-  { text: "Dukungan prioritas" },
+  { text: "Pemindaian struk dengan AI", footnote: "10 pemindaian per bulan" },
 ];
 
 const plans: Plan[] = [
@@ -44,7 +42,7 @@ const plans: Plan[] = [
     name: "Free",
     price: 0,
     badge: "FREE",
-    features: originalFeatures.slice(0, 4),
+    features: originalFeatures.slice(0, 5),
     isHighlighted: false,
   },
   {

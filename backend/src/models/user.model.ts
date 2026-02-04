@@ -17,6 +17,8 @@ export interface UserDocument extends Document {
   comparePassword: (password: string) => Promise<boolean>;
   omitPassword: () => Omit<UserDocument, "password">;
   role: "user" | "admin";
+  aiScanQuota: number;
+  aiScanQuotaResetAt: Date | null;
 }
 
 const userSchema = new Schema<UserDocument>(
@@ -78,6 +80,14 @@ userSchema.add({
     type: String,
     enum: ["user", "admin"],
     default: "user",
+  },
+  aiScanQuota: {
+    type: Number,
+    default: 10,
+  },
+  aiScanQuotaResetAt: {
+    type: Date,
+    default: null,
   },
 });
 

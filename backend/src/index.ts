@@ -21,7 +21,7 @@ import analyticsRoutes from "./routes/analytics.route";
 import connectDB from "./config/database.config";
 import { initializeMidtrans } from "./config/midtrans.config";
 import paymentRoutes from "./routes/payment.route";
-import assetRoutes from "./routes/asset.route";
+// import assetRoutes from "./routes/asset.route";
 import budgetRoutes from "./routes/budget.route";
 import adminRoutes from "./routes/admin.route";
 
@@ -57,7 +57,7 @@ app.use(`${BASE_PATH}/transaction`, passportAuthenticateJwt, transactionRoutes);
 app.use(`${BASE_PATH}/report`, passportAuthenticateJwt, reportRoutes);
 app.use(`${BASE_PATH}/analytics`, passportAuthenticateJwt, analyticsRoutes);
 app.use(`${BASE_PATH}/payment`, paymentRoutes);
-app.use(`${BASE_PATH}/asset`, passportAuthenticateJwt, assetRoutes);
+// app.use(`${BASE_PATH}/asset`, passportAuthenticateJwt, assetRoutes);
 app.use(`${BASE_PATH}/budget`, passportAuthenticateJwt, budgetRoutes);
 app.use(`${BASE_PATH}/admin`, passportAuthenticateJwt, adminRoutes);
 

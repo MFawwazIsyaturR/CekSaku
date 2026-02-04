@@ -4,7 +4,7 @@ import {
   LayoutGrid,
   ReceiptText,
   TrendingUp,
-  Briefcase,
+  // Briefcase,
   Menu,
   Settings,
   LogOut,
@@ -29,7 +29,7 @@ import { Separator } from "@/components/ui/separator";
 const primaryNavItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
   { label: "Transaksi", href: "/transactions", icon: ReceiptText },
-  { label: "Aset", href: "/assets", icon: Briefcase },
+  // { label: "Aset", href: "/assets", icon: Briefcase },
   { label: "Laporan", href: "/reports", icon: TrendingUp },
 ];
 

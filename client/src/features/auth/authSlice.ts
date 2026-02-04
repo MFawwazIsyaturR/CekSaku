@@ -20,6 +20,8 @@ interface User {
   subscriptionExpiredAt?: string | Date | null;
   subscriptionPaymentType?: string;
   role?: "user" | "admin";
+  aiScanQuota?: number;
+  aiScanQuotaResetAt?: string | Date | null;
 }
 
 interface ReportSetting {
