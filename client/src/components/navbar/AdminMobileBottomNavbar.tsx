@@ -2,7 +2,6 @@ import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
     LayoutGrid,
-    Users,
     CreditCard,
     Menu,
     Settings,
@@ -26,7 +25,6 @@ import { Separator } from "@/components/ui/separator";
 
 const primaryNavItems = [
     { label: "Dashboard", href: "/admin", icon: LayoutGrid },
-    { label: "Pengguna", href: "/admin/users", icon: Users },
     { label: "Pembayaran", href: "/admin/payments", icon: CreditCard },
 ];
 

@@ -1,14 +1,13 @@
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Users, Settings, CreditCard } from "lucide-react";
+import { LayoutGrid, Settings, CreditCard } from "lucide-react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
 import AdminMobileBottomNavbar from "@/components/navbar/AdminMobileBottomNavbar";
 
 const adminNavItems = [
     { label: "Dashboard", href: "/admin", icon: LayoutGrid },
-    { label: "Daftar Pengguna", href: "/admin/users", icon: Users },
     { label: "Kelola Pembayaran", href: "/admin/payments", icon: CreditCard },
     { label: "Pengaturan", href: "/admin/settings", icon: Settings },
 ];

@@ -19,7 +19,6 @@ import Payment from "@/pages/settings/payment";
 import AssetsPage from "@/pages/assets";
 import VerifyEmail from "@/pages/auth/_component/verify-email";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
-import UserList from "@/pages/admin/UserList";
 
 export const authenticationRoutePaths = [
   { path: AUTH_ROUTES.LANDING, element: <LandingPage /> },
@@ -39,8 +38,6 @@ import PaymentManagement from "@/pages/admin/PaymentManagement";
 
 export const adminRoutePaths = [
   { path: PROTECTED_ROUTES.ADMIN_DASHBOARD, element: <AdminDashboard /> },
-  { path: PROTECTED_ROUTES.ADMIN_USERS, element: <UserList /> },
-
 
   { path: PROTECTED_ROUTES.ADMIN_PAYMENTS, element: <PaymentManagement /> },
   {

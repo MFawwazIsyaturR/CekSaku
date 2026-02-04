@@ -2,30 +2,7 @@ import { apiClient } from "@/app/api-client";
 import { UpdateUserResponse, User } from "./userType";
 import { ChangePasswordType } from "@/../../backend/src/validators/user.validator";
 
-export interface AdminUser {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  createdAt: string;
-}
 
-export interface GetUsersResponse {
-  data: {
-    users: AdminUser[];
-    pagination: {
-      totalPages: number;
-      currentPage: number;
-      totalUsers: number;
-    };
-  };
-}
-
-export interface GetUsersParams {
-  page: number;
-  limit: number;
-  search: string;
-}
 
 export interface GrowthPoint {
   date: string;
@@ -84,10 +61,7 @@ export interface GetPaymentLogsResponse {
 
 
 
-export interface AdminUpdateUserParams {
-  id: string;
-  role: string;
-}
+
 
 export const userApi = apiClient.injectEndpoints({
   endpoints: (builder) => ({
@@ -119,29 +93,7 @@ export const userApi = apiClient.injectEndpoints({
       }),
       providesTags: ['UserProfile'],
     }),
-    getUsers: builder.query<GetUsersResponse, GetUsersParams>({
-      query: (params) => ({
-        url: "/admin/users",
-        method: "GET",
-        params,
-      }),
-      providesTags: ['Users'],
-    }),
-    adminUpdateUser: builder.mutation<void, AdminUpdateUserParams>({
-      query: ({ id, role }) => ({
-        url: `/admin/users/${id}`,
-        method: "PUT",
-        body: { role },
-      }),
-      invalidatesTags: ['Users'],
-    }),
-    adminDeleteUser: builder.mutation<void, string>({
-      query: (id) => ({
-        url: `/admin/users/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ['Users', 'transactions' as any],
-    }),
+
     getAdminStats: builder.query<GetAdminStatsResponse, string | void>({
       query: (range) => ({
         url: "/admin/stats",
@@ -175,10 +127,7 @@ export const {
   useDeleteUserMutation,
   useChangePasswordMutation,
   useGetUserProfileQuery,
-  useGetUsersQuery,
   useGetAdminStatsQuery,
-  useAdminUpdateUserMutation,
-  useAdminDeleteUserMutation,
 
   useGetAdminPaymentLogsQuery,
   useAdminUpdatePaymentStatusMutation

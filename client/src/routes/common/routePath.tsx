@@ -22,7 +22,6 @@ export const PROTECTED_ROUTES = {
   SETTINGS_SECURITY: "/settings/security",
   SETTINGS_PAYMENT: "/settings/pembayaran",
   ADMIN_DASHBOARD: "/admin",
-  ADMIN_USERS: "/admin/users",
 
   ADMIN_TRANSACTIONS: "/admin/transactions",
   ADMIN_SETTINGS: "/admin/settings",
